@@ -777,9 +777,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           </button>
         </div>
       </div>
-
-      {/* AI 실사 화보 세부옵션 (미세조정 바로 아래) */}
-      {showAiPanel && renderAiOptions()}
     </div>
   );
 
@@ -816,8 +813,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           setAiCommentary('');
           setAiError(null);
           setShowAiPanel(true);
-          setShowAdjustPanel(true);
-          setMobileSubTab('adjust');
+          setTimeout(() => {
+            document.getElementById('ai-options-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 80);
         }}
         className="w-full py-3.5 px-4 rounded-2xl font-sans text-sm font-bold bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 hover:from-amber-700 hover:to-rose-700 text-white shadow-md active:scale-95 flex items-center justify-center gap-2 transition-all cursor-pointer border border-amber-400/20"
       >
@@ -1232,6 +1230,13 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
                 >
                   위치 조절 ⚙️
                 </button>
+              </div>
+            )}
+
+            {/* AI 실사 화보 세부옵션 (스테이지 카드 바로 아래, 모든 화면 폭) */}
+            {showAiPanel && (
+              <div id="ai-options-panel" className="w-full mt-3">
+                {renderAiOptions()}
               </div>
             )}
 
