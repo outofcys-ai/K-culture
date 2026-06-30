@@ -2,6 +2,13 @@ import React from 'react';
 import { HanbokItem } from '../types';
 import { TransparentHanbok } from '../components/TransparentHanbok';
 
+import imgRoyalDangui from '../assets/images/royal_dangui_green_red_1782790634396.jpg';
+import imgPastelFusion from '../assets/images/purple_fusion_female_1782790593274.jpg';
+import imgScholarDopo from '../assets/images/white_dopo_male_1782790545989.jpg';
+import imgKidsSaekdong from '../assets/images/red_royal_saekdong_1782790611451.jpg';
+import imgGoldYongpo from '../assets/images/gold_yongpo_photo_1782789784644.jpg';
+import imgYellowTraditional from '../assets/images/yellow_traditional_female_1782790531164.jpg';
+
 export const HANBOKS: HanbokItem[] = [
   {
     id: 'royal_dangui',
@@ -12,8 +19,8 @@ export const HANBOKS: HanbokItem[] = [
     defaultScale: 1.15,
     defaultYOffset: 202,
     render: (scale, colorAccent) => (
-      <TransparentHanbok 
-        src="/src/assets/images/royal_dangui_green_red_1782790634396.jpg" 
+      <TransparentHanbok
+        src={imgRoyalDangui}
         colorAccent={colorAccent}
       />
     ),
@@ -27,8 +34,8 @@ export const HANBOKS: HanbokItem[] = [
     defaultScale: 1.15,
     defaultYOffset: 200,
     render: (scale, colorAccent) => (
-      <TransparentHanbok 
-        src="/src/assets/images/purple_fusion_female_1782790593274.jpg" 
+      <TransparentHanbok
+        src={imgPastelFusion}
         colorAccent={colorAccent}
       />
     ),
@@ -42,8 +49,8 @@ export const HANBOKS: HanbokItem[] = [
     defaultScale: 1.15,
     defaultYOffset: 205,
     render: (scale, colorAccent) => (
-      <TransparentHanbok 
-        src="/src/assets/images/white_dopo_male_1782790545989.jpg" 
+      <TransparentHanbok
+        src={imgScholarDopo}
         colorAccent={colorAccent}
       />
     ),
@@ -57,8 +64,8 @@ export const HANBOKS: HanbokItem[] = [
     defaultScale: 1.1,
     defaultYOffset: 200,
     render: (scale, colorAccent) => (
-      <TransparentHanbok 
-        src="/src/assets/images/red_royal_saekdong_1782790611451.jpg" 
+      <TransparentHanbok
+        src={imgKidsSaekdong}
         colorAccent={colorAccent}
       />
     ),
@@ -72,8 +79,8 @@ export const HANBOKS: HanbokItem[] = [
     defaultScale: 1.15,
     defaultYOffset: 205,
     render: (scale, colorAccent) => (
-      <TransparentHanbok 
-        src="/src/assets/images/gold_yongpo_photo_1782789784644.jpg" 
+      <TransparentHanbok
+        src={imgGoldYongpo}
         colorAccent={colorAccent}
       />
     ),
@@ -87,8 +94,8 @@ export const HANBOKS: HanbokItem[] = [
     defaultScale: 1.1,
     defaultYOffset: 200,
     render: (scale, colorAccent) => (
-      <TransparentHanbok 
-        src="/src/assets/images/yellow_traditional_female_1782790531164.jpg" 
+      <TransparentHanbok
+        src={imgYellowTraditional}
         colorAccent={colorAccent}
       />
     ),
@@ -111,7 +118,6 @@ export const ACCESSORIES: HanbokItem[] = [
         xmlns="http://www.w3.org/2000/svg"
       >
         <g id="gat-hat-drawing" transform={`scale(${scale})`} transformOrigin="100 85">
-          {/* Hat string dangling beads (갓끈) */}
           <path d="M72,85 C73,122 100,165 100,165 C100,165 127,122 128,85" fill="none" stroke="#60A5FA" strokeWidth="2" opacity="0.8" />
           <circle cx="82" cy="115" r="3" fill="#EF4444" />
           <circle cx="91" cy="138" r="3.5" fill="#FBBF24" />
@@ -119,7 +125,6 @@ export const ACCESSORIES: HanbokItem[] = [
           <circle cx="109" cy="138" r="3.5" fill="#FBBF24" />
           <circle cx="118" cy="115" r="3" fill="#EF4444" />
 
-          {/* Gat Hat crown pillar */}
           <path
             d="M75,80 L79,25 Q100,20 121,25 L125,80 Z"
             fill="#1E293B"
@@ -128,15 +133,12 @@ export const ACCESSORIES: HanbokItem[] = [
             strokeWidth="3.5"
             strokeLinejoin="round"
           />
-          {/* Outer shade */}
           <path d="M90,23 L93,80" stroke="#475569" strokeWidth="1.5" opacity="0.5" />
           <path d="M100,22 L100,80" stroke="#475569" strokeWidth="2" opacity="0.6" />
           <path d="M110,23 L107,80" stroke="#475569" strokeWidth="1.5" opacity="0.5" />
 
-          {/* Red knot/band around crown */}
           <rect x="76.5" y="72" width="47" height="6" fill="#DC2626" />
 
-          {/* Gat Wide Brim */}
           <ellipse
             cx="100"
             cy="85"
@@ -147,7 +149,6 @@ export const ACCESSORIES: HanbokItem[] = [
             stroke="#030712"
             strokeWidth="4"
           />
-          {/* Outer mesh oval lines */}
           <ellipse cx="100" cy="85" rx="60" ry="12" fill="none" stroke="#4B5563" strokeWidth="1" opacity="0.5" />
           <ellipse cx="100" cy="85" rx="35" ry="7" fill="none" stroke="#4B5563" strokeWidth="1" opacity="0.5" />
         </g>
@@ -169,7 +170,6 @@ export const ACCESSORIES: HanbokItem[] = [
         xmlns="http://www.w3.org/2000/svg"
       >
         <g id="jokduri-drawing" transform={`scale(${scale})`} transformOrigin="100 80">
-          {/* Cap */}
           <path
             d="M68,85 L72,45 L128,45 L132,85 Z"
             fill="#1E293B"
@@ -177,27 +177,18 @@ export const ACCESSORIES: HanbokItem[] = [
             strokeWidth="3.5"
             strokeLinejoin="round"
           />
-
-          {/* Badges */}
           <circle cx="85" cy="65" r="9" fill="#FACC15" stroke="#CA8A04" strokeWidth="1.5" />
           <circle cx="85" cy="65" r="4" fill="#DC2626" />
-
           <circle cx="115" cy="65" r="9" fill="#FACC15" stroke="#CA8A04" strokeWidth="1.5" />
           <circle cx="115" cy="65" r="4" fill="#DC2626" />
-
           <rect x="94" y="52" width="12" height="15" rx="2" fill="#FACC15" stroke="#CA8A04" strokeWidth="1.5" />
           <circle cx="100" cy="60" r="3" fill="#10B981" />
-
-          {/* Red Gem */}
           <ellipse cx="100" cy="38" rx="10" ry="6" fill="#DC2626" stroke="#991B1B" strokeWidth="1.5" />
           <circle cx="100" cy="27" r="5" fill="#FACC15" />
           <circle cx="100" cy="20" r="3" fill="#3B82F6" />
-
-          {/* Ribbons */}
           <path d="M55,80 L35,160" stroke="#DC2626" strokeWidth="2.5" strokeLinecap="round" />
           <circle cx="35" cy="164" r="5" fill="#EF4444" />
           <circle cx="40" cy="120" r="3" fill="#FBBF24" />
-
           <path d="M145,80 L165,160" stroke="#DC2626" strokeWidth="2.5" strokeLinecap="round" />
           <circle cx="165" cy="164" r="5" fill="#EF4444" />
           <circle cx="160" cy="120" r="3" fill="#FBBF24" />
@@ -227,7 +218,6 @@ export const ACCESSORIES: HanbokItem[] = [
             strokeWidth="3.5"
             strokeLinecap="round"
           />
-
           <g transform="translate(100, 52)">
             <rect x="-12" y="-4" width="24" height="8" rx="2" fill="#DB2777" />
             <circle cx="-10" cy="0" r="8" fill="#F472B6" stroke="#991B1B" strokeWidth="1.5" />
@@ -288,18 +278,8 @@ export const ACCESSORIES: HanbokItem[] = [
         <g id="norigae-drawing" transform={`scale(${scale})`} transformOrigin="100 45">
           <path d="M100,5 L100,45" fill="none" stroke="#EA580C" strokeWidth="3" />
           <circle cx="100" cy="25" r="4.5" fill="#B45309" />
-          <path
-            d="M90,38 C80,28 75,48 95,43 L100,45"
-            fill="#DC2626"
-            stroke="#991B1B"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M110,38 C120,28 125,48 105,43 L100,45"
-            fill="#DC2626"
-            stroke="#991B1B"
-            strokeWidth="1.5"
-          />
+          <path d="M90,38 C80,28 75,48 95,43 L100,45" fill="#DC2626" stroke="#991B1B" strokeWidth="1.5" />
+          <path d="M110,38 C120,28 125,48 105,43 L100,45" fill="#DC2626" stroke="#991B1B" strokeWidth="1.5" />
           <circle cx="100" cy="43" r="5" fill="#DC2626" stroke="#991B1B" strokeWidth="1" />
           <polygon points="90,52 110,52 115,72 85,72" fill="#10B981" stroke="#047857" strokeWidth="2.5" />
           <ellipse cx="100" cy="62" rx="6" ry="6" fill="#F1F5F9" opacity="0.3" />
