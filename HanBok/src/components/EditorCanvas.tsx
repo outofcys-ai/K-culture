@@ -856,7 +856,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
                   
                   {/* Layer 1: Base Template */}
                   <div
-                    className="absolute pointer-events-none transition-all duration-75 flex items-center justify-center rounded-full overflow-hidden"
+                    onPointerDown={() => { setActiveTarget('character'); setShowAdjustPanel(true); }}
+                    className="absolute pointer-events-auto cursor-move transition-all duration-75 flex items-center justify-center rounded-full overflow-hidden"
                     style={{
                       width: '240px',
                       height: '240px',
@@ -893,7 +894,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
                   {/* Layer 2: Hanbok Active Overlay */}
                   {selectedHanbok && (
                     <div
-                      className="absolute pointer-events-none transition-all duration-75 flex items-center justify-center"
+                      onPointerDown={() => { setActiveTarget('hanbok'); setShowAdjustPanel(true); }}
+                      className="absolute pointer-events-auto cursor-move transition-all duration-75 flex items-center justify-center"
                       style={{
                         width: '320px',
                         height: '280px',
@@ -915,7 +917,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
                   {/* Layer 3: Accessory Active Overlay */}
                   {selectedAccessory && (
                     <div
-                      className="absolute pointer-events-none transition-all duration-75 flex items-center justify-center"
+                      onPointerDown={() => { setActiveTarget('accessory'); setShowAdjustPanel(true); }}
+                      className="absolute pointer-events-auto cursor-move transition-all duration-75 flex items-center justify-center"
                       style={{
                         width: '200px',
                         height: '120px',
