@@ -11,6 +11,10 @@ async function startServer() {
   const PORT = 3000;
 
   app.use(express.json());
+  app.use((req, res, next) => {
+    res.setHeader("X-Frame-Options", "ALLOWALL");
+    next();
+  });
 
   // API Route for Pungryu analysis
   app.post("/api/analyze-pungryu", async (req, res) => {
