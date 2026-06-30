@@ -433,67 +433,79 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     });
   };
 
-  // 수학 공식 기반 자동 맞춤:
-  // charY=-70: 캐릭터 얼굴을 캔버스 상단에 배치해 얼굴+한복이 동시에 보이게 함
-  // - 한복 목선: hanbokY = chinY + 140 - necklineFromTop  (턱 위치 기준)
-  // - 갓/족두리: accY = headTopY - brimFromCenter + 5  (머리 꼭대기 기준)
+  // 수학 공식 기반 자동 맞춤 (7~8등신 비율 + 카드 중앙 정렬):
+  // 1) 캐릭터를 0.6배로 축소해 얼굴을 한복에 비해 작게 (등신 비율 개선)
+  // 2) 턱 위치에 한복 목선을 정렬
+  // 3) 머리 꼭대기/이마 기준으로 장신구를 머리 폭에 비례해 배치
+  // 4) 전체 구성(머리~한복단)을 계산해 carY를 역산 → 카드 중앙에 자동 배치
   const applySmartFitting = () => {
     setActivePresetFit('smart');
 
-    const charY = -70; // 캐릭터를 캔버스 상단으로 올려 얼굴+한복 동시 표시
-    setCharacterTransform({ x: 0, y: charY, scale: 1.0, rotation: 0, flipX: false, opacity: 1 });
+    const s = 0.6; // 캐릭터(얼굴) 축소 배율
+    const { headTopOffset, headRadius } = selectedCharacter;
+    const headRadiusEff = headRadius * s; // 축소 후 머리 반지름
+
+    // 한복은 자체 비율만 사용(얼굴이 작아졌으므로 캐릭터 배수 제거 + 카드폭 안에 들어오게 0.85)
+    const sH = selectedHanbok ? (selectedHanbok.defaultScale || 1.0) * 0.85 : 1.0;
+    const necklineFromTop = selectedHanbok ? (selectedHanbok.necklineFromTop ?? 30) : 30;
+
+    const accId = selectedAccessory?.id;
+    const hasHat = accId === 'gat_hat' || accId === 'jokduri_crown' || accId === 'baessi_daenggi';
+
+    // charY 기준 상대 좌표로 전체 구성의 위/아래 끝을 구해 중앙 정렬
+    const relTop = headTopOffset * s - (hasHat ? 55 : 12); // 모자 헤드룸 확보
+    const chinRel = 120 * s; // 턱
+    const relBottom = selectedHanbok
+      ? chinRel + (280 - necklineFromTop) * sH // 한복 단(밑단)
+      : chinRel + 20;
+    const charY = -Math.round((relTop + relBottom) / 2);
+
+    setCharacterTransform({ x: 0, y: charY, scale: s, rotation: 0, flipX: false, opacity: 1 });
+
+    const chinY = charY + chinRel;
+    const headTopY = charY + headTopOffset * s;
 
     if (selectedHanbok) {
-      const necklineFromTop = selectedHanbok.necklineFromTop ?? 30;
-      // 턱(charY+120)이 한복 목선과 일치하도록: hanbokCenter = chinY + 140 - necklineFromTop
-      const hanbokY = charY + 120 + 140 - necklineFromTop;
-      const hanbokScale = selectedCharacter.defaultHanbokScale * (selectedHanbok.defaultScale || 1.0);
-      setHanbokTransform({ x: 0, y: hanbokY, scale: hanbokScale, rotation: 0, flipX: false, opacity: 1 });
+      // 턱(chinY)에 목선이 닿도록: hanbokCenter = chinY + (140 - necklineFromTop)*sH
+      const hanbokY = chinY + (140 - necklineFromTop) * sH;
+      setHanbokTransform({ x: 0, y: hanbokY, scale: sH, rotation: 0, flipX: false, opacity: 1 });
     }
 
     if (selectedAccessory) {
-      const { headTopOffset, headRadius } = selectedCharacter;
-      const headTopY = charY + headTopOffset; // 캔버스 기준 머리 꼭대기 Y
-      const accId = selectedAccessory.id;
       let accX = 0;
       let accY = 0;
       let accScale = 1.0;
 
       if (accId === 'gat_hat') {
-        // 갓 챙 하단(컨테이너 중심 +43px)을 머리 꼭대기에 살짝 겹치게 배치
-        const brimFromCenter = 43;
-        accY = headTopY - brimFromCenter + 5;
-        // 챙 너비(170px)를 머리 폭에 맞춤
-        accScale = (headRadius * 2) / 170;
+        // 갓 챙(폭 170)을 머리보다 살짝 넓게, 챙 하단을 머리 꼭대기에 얹음
+        accScale = ((headRadiusEff * 2) / 170) * 1.15;
+        accY = headTopY - 43 * accScale + 8;
 
       } else if (accId === 'jokduri_crown') {
-        // 족두리 하단(컨테이너 중심 +25px)을 머리 꼭대기에 맞춤
-        const crownBottomFromCenter = 25;
-        accY = headTopY - crownBottomFromCenter + 5;
-        accScale = 0.8;
+        // 족두리(폭 64)는 머리보다 좁게, 하단을 머리 꼭대기에 얹음
+        accScale = ((headRadiusEff * 2) / 64) * 0.55;
+        accY = headTopY - 25 * accScale + 6;
 
       } else if (accId === 'baessi_daenggi') {
-        // 배씨댕기는 이마 위치(머리 꼭대기 + 반지름 60%)에 배치
-        const foreheadY = headTopY + headRadius * 0.6;
-        const bandFromCenter = 25;
-        accY = foreheadY - bandFromCenter;
-        accScale = 0.85;
+        // 배씨댕기(폭 120)는 이마(머리 꼭대기+반지름 50%) 위에 배치
+        accScale = ((headRadiusEff * 2) / 120) * 0.9;
+        accY = headTopY + headRadiusEff * 0.5;
 
       } else if (accId === 'daenggi_ribbon') {
-        // 댕기는 머리 옆/뒤에서 아래로 늘어짐
-        accX = 35;
-        accY = headTopY + headRadius * 0.5;
-        accScale = 0.75;
+        // 댕기는 머리 옆에서 아래로 늘어짐
+        accX = headRadiusEff * 0.7;
+        accY = headTopY + headRadiusEff;
+        accScale = 0.6;
 
       } else if (accId === 'norigae_pendant') {
-        // 노리개는 한복 옷고름 위치(가슴 앞)
+        // 노리개는 가슴 앞 옷고름 위치
         accX = 18;
-        accY = charY + 90;
-        accScale = 0.55;
+        accY = chinY + 70 * sH;
+        accScale = 0.5;
 
       } else {
-        accY = (selectedAccessory.defaultYOffset || 80) - 180;
-        accScale = selectedAccessory.defaultScale || 0.9;
+        accY = headTopY;
+        accScale = 0.7;
       }
 
       setAccessoryTransform({ x: accX, y: accY, scale: accScale, rotation: 0, flipX: false, opacity: 1 });
