@@ -17,3 +17,13 @@ k-wave/.env
 k-wave/.env.local
 HanBok/.env
 HanBok/.env.local
+
+# 불필요한 임시/원본 파일
+image/
+*.zip
+build-output.txt
+build-output-escalated.txt
+checklist.md
+context-notes.md
+table.csv
+.claude/
