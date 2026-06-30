@@ -57,7 +57,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   const [aspectRatio, setAspectRatio] = useState<string>('1:1');
   const [imageSize, setImageSize] = useState<string>('1K');
   const [framing, setFraming] = useState<string>('full');
-  const [showAiModal, setShowAiModal] = useState(false);
+  const [showAiPanel, setShowAiPanel] = useState(false); // AI 세부옵션을 미세조정 아래 인라인으로 표시
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
   const [aiCommentary, setAiCommentary] = useState<string>('');
@@ -79,8 +79,8 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           characterName: selectedCharacter.name,
           activeTab,
           userPhotoData: activeTab === 'myphoto' ? userPhotoUrl : null,
-          hanbokTitle: selectedHanbok ? selectedHanbok.title : '기본 흰 단아한 한복',
-          accessoryTitle: selectedAccessory ? selectedAccessory.title : '없음',
+          hanbokTitle: selectedHanbok ? selectedHanbok.name : '기본 흰 단아한 한복',
+          accessoryTitle: selectedAccessory ? selectedAccessory.name : '없음',
           dyeColor,
           conceptStyle,
           aspectRatio,
@@ -777,6 +777,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           </button>
         </div>
       </div>
+
+      {/* AI 실사 화보 세부옵션 (미세조정 바로 아래) */}
+      {showAiPanel && renderAiOptions()}
     </div>
   );
 
@@ -812,7 +815,9 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
           setAiImageUrl(null);
           setAiCommentary('');
           setAiError(null);
-          setShowAiModal(true);
+          setShowAiPanel(true);
+          setShowAdjustPanel(true);
+          setMobileSubTab('adjust');
         }}
         className="w-full py-3.5 px-4 rounded-2xl font-sans text-sm font-bold bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 hover:from-amber-700 hover:to-rose-700 text-white shadow-md active:scale-95 flex items-center justify-center gap-2 transition-all cursor-pointer border border-amber-400/20"
       >
@@ -822,6 +827,147 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
 
       <p className="text-[10px] text-center text-stone-500 font-sans leading-relaxed">
         고른 옷을 캔버스 위 수동 합성하여 PNG로 내려받거나, <strong>AI 화보관</strong>에서 실사형 고품격 한복 착장 이미지를 즉시 그려내 소장(무료)하세요!
+      </p>
+    </div>
+  );
+
+  // AI 실사 화보 세부옵션 패널 (미세조정 아래 인라인 표시)
+  const renderAiOptions = () => (
+    <div className="flex flex-col gap-3 p-3.5 border border-amber-200 rounded-2xl bg-amber-50/60 shadow-sm">
+      <div className="flex justify-between items-center">
+        <span className="text-xs font-bold text-amber-900 flex items-center gap-1">
+          <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+          AI 실사 화보 세부 설정
+        </span>
+        <button
+          onClick={() => setShowAiPanel(false)}
+          className="text-[10px] px-2 py-1 border border-amber-200 bg-white hover:bg-amber-50 text-amber-700 rounded-md transition-all flex items-center gap-1"
+        >
+          <X className="w-2.5 h-2.5" /> 닫기
+        </button>
+      </div>
+
+      {/* 배경 테마 */}
+      <div>
+        <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider select-none">🏞️ 배경 테마</span>
+        <div className="grid grid-cols-2 gap-1.5 mt-1.5">
+          {[
+            { id: 'palace', name: '🏰 궁궐 앞뜰' },
+            { id: 'garden', name: '🌸 매화 정원' },
+            { id: 'night', name: '🏮 은은한 야경' },
+            { id: 'studio', name: '📸 전통 스튜디오' },
+          ].map((style) => (
+            <button
+              key={style.id}
+              onClick={() => setConceptStyle(style.id as any)}
+              className={`py-1.5 px-2 rounded-lg border text-[11px] font-sans font-semibold transition-all cursor-pointer text-center ${
+                conceptStyle === style.id
+                  ? 'bg-amber-900 text-amber-50 border-amber-900 shadow'
+                  : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
+              }`}
+            >
+              {style.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 구도 */}
+      <div>
+        <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider select-none">📐 화보 구도</span>
+        <div className="flex gap-1.5 mt-1.5">
+          {[
+            { id: 'full', name: '전신' },
+            { id: 'half', name: '상반신' },
+          ].map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setFraming(f.id)}
+              className={`flex-1 py-1.5 px-2 rounded-lg border text-[11px] font-sans font-semibold transition-all cursor-pointer text-center ${
+                framing === f.id
+                  ? 'bg-amber-900 text-amber-50 border-amber-900 shadow'
+                  : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
+              }`}
+            >
+              {f.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 비율 */}
+      <div>
+        <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider select-none">🖼️ 크기 비율</span>
+        <div className="grid grid-cols-2 gap-1.5 mt-1.5">
+          {[
+            { id: '1:1', name: '정사각형 (1:1)' },
+            { id: '3:4', name: '세로형 (3:4)' },
+            { id: '9:16', name: '스마트폰 (9:16)' },
+            { id: '4:3', name: '가로형 (4:3)' },
+          ].map((ratio) => (
+            <button
+              key={ratio.id}
+              onClick={() => setAspectRatio(ratio.id)}
+              className={`py-1.5 px-2 rounded-lg border text-[11px] font-sans font-semibold transition-all cursor-pointer text-center ${
+                aspectRatio === ratio.id
+                  ? 'bg-amber-900 text-amber-50 border-amber-900 shadow'
+                  : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
+              }`}
+            >
+              {ratio.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 해상도 */}
+      <div>
+        <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider select-none">✨ 이미지 해상도</span>
+        <div className="flex gap-1.5 mt-1.5">
+          {[
+            { id: '512px', name: '512px' },
+            { id: '1K', name: '1K' },
+            { id: '2K', name: '2K' },
+          ].map((sz) => (
+            <button
+              key={sz.id}
+              onClick={() => setImageSize(sz.id)}
+              className={`flex-1 py-1.5 px-2 rounded-lg border text-[11px] font-sans font-semibold transition-all cursor-pointer text-center ${
+                imageSize === sz.id
+                  ? 'bg-amber-900 text-amber-50 border-amber-900 shadow'
+                  : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
+              }`}
+            >
+              {sz.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 생성 버튼 */}
+      <button
+        onClick={generateAiPortrait}
+        disabled={isAiGenerating}
+        className={`w-full py-3 rounded-xl text-xs font-sans font-bold tracking-wide shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border ${
+          isAiGenerating
+            ? 'bg-amber-100 text-amber-800 border-amber-200 cursor-wait'
+            : 'bg-amber-900 hover:bg-amber-950 text-amber-50 border-amber-950 active:scale-95'
+        }`}
+      >
+        {isAiGenerating ? (
+          <>
+            <RefreshCw className="w-4 h-4 animate-spin text-amber-800" />
+            붓자국을 누비는 중...
+          </>
+        ) : (
+          <>
+            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+            실사 한복 화보 그리기 (무료)
+          </>
+        )}
+      </button>
+      <p className="text-[10px] text-center text-stone-500 font-sans leading-relaxed">
+        생성하면 위 한복 입히기 카드의 그림이 선택한 세부설정의 AI 실사 화보로 바뀝니다.
       </p>
     </div>
   );
@@ -958,6 +1104,74 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
                       : '장신구 위치 드래그가능'}
                 </span>
               </div>
+
+              {/* AI 실사 화보 결과/로딩 오버레이 (기존 그림을 덮어 카드 안에 표시) */}
+              {(isAiGenerating || aiImageUrl || aiError) && (
+                <div className="absolute inset-0 z-40 bg-[#FCF9F2] flex flex-col items-center justify-center p-3 text-center">
+                  {isAiGenerating ? (
+                    <>
+                      <div className="relative w-14 h-14 flex items-center justify-center">
+                        <div className="absolute inset-0 rounded-full border-4 border-amber-200/50 animate-ping" />
+                        <div className="absolute inset-0 rounded-full border-t-4 border-amber-800 animate-spin" />
+                        <span className="text-2xl animate-bounce">🖌️</span>
+                      </div>
+                      <p className="text-[11px] text-stone-600 font-sans leading-relaxed mt-4 px-2">
+                        선택한 세부설정으로 실사 한복 화보를 그리는 중입니다... (3~7초)
+                      </p>
+                    </>
+                  ) : aiError ? (
+                    <>
+                      <span className="text-3xl select-none">🏮</span>
+                      <h4 className="font-sans font-bold text-rose-950 mt-2 text-sm">생성 오류</h4>
+                      <p className="text-[11px] text-rose-800 leading-relaxed font-sans mt-1.5 px-2 max-h-[120px] overflow-y-auto">
+                        {aiError}
+                      </p>
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          onClick={generateAiPortrait}
+                          className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[11px] font-semibold font-sans transition-all active:scale-95 cursor-pointer"
+                        >
+                          다시 시도
+                        </button>
+                        <button
+                          onClick={() => { setAiError(null); }}
+                          className="px-3 py-1.5 bg-white border border-stone-300 hover:bg-stone-50 text-stone-700 rounded-lg text-[11px] font-semibold font-sans transition-all active:scale-95 cursor-pointer"
+                        >
+                          편집으로 돌아가기
+                        </button>
+                      </div>
+                    </>
+                  ) : aiImageUrl ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-2.5">
+                      <img
+                        src={aiImageUrl}
+                        alt="AI 한복 실사 화보"
+                        className="max-w-full max-h-[calc(100%-46px)] object-contain rounded-xl shadow-lg"
+                        referrerPolicy="no-referrer"
+                      />
+                      {aiCommentary && (
+                        <p className="text-[10px] text-stone-600 font-sans italic leading-snug line-clamp-2 px-2">
+                          &ldquo;{aiCommentary}&rdquo;
+                        </p>
+                      )}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={downloadAiPortrait}
+                          className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 text-white rounded-lg text-[11px] font-bold font-sans flex items-center gap-1 transition-all shadow active:scale-95 cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" /> 화보 저장
+                        </button>
+                        <button
+                          onClick={() => { setAiImageUrl(null); setAiCommentary(''); }}
+                          className="px-3 py-1.5 bg-white border border-stone-300 hover:bg-stone-50 text-stone-700 rounded-lg text-[11px] font-semibold font-sans transition-all active:scale-95 cursor-pointer"
+                        >
+                          편집으로 돌아가기
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              )}
             </div>
 
             {/* Quick fitting buttons */}
@@ -1107,391 +1321,6 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
       </div>
     </div>
 
-    {/* AI Realistic Portrait Overlay Modal */}
-    <AnimatePresence>
-      {showAiModal && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md overflow-y-auto"
-        >
-          <motion.div
-            initial={{ scale: 0.95, y: 15 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.95, y: 15 }}
-            transition={{ type: "spring", duration: 0.5 }}
-            className="w-full max-w-4xl bg-[#FDFBF7] border-4 border-amber-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[92vh] md:max-h-[85vh] relative"
-          >
-            {/* Close Button top-right */}
-            <button
-              onClick={() => setShowAiModal(false)}
-              className="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-700 hover:text-stone-900 transition-all cursor-pointer shadow-sm active:scale-95"
-            >
-              <X className="w-4 h-4 cursor-pointer" />
-            </button>
-
-            {/* LEFT SIDE: Planning & Configuration Panel */}
-            <div className="w-full md:w-1/2 p-6 md:p-8 border-b md:border-b-0 md:border-r border-amber-900/10 flex flex-col justify-between overflow-y-auto">
-              <div>
-                <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-950 font-sans font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full border border-amber-200 select-none">
-                  <Sparkles className="w-3 h-3 text-amber-700 animate-pulse" />
-                  AI STUDIO PICTORIAL
-                </span>
-
-                <h3 className="font-sans font-extrabold text-xl md:text-2xl text-stone-900 tracking-tight mt-3">
-                  ✨ AI 한복 화보 기획실
-                </h3>
-                <p className="text-xs text-stone-600 font-sans mt-1 leading-relaxed">
-                  인공지능 화공이 최신 기술을 부려 실제 비단 원단 감각과 광원 처리를 극대화한 실사형 한복 초상화를 기기 비용 없이 무료로 정교하게 그려냅니다.
-                </p>
-
-                {/* Live Design Specification status */}
-                <div className="mt-5 p-4 rounded-2xl bg-amber-50/50 border border-amber-900/5 flex flex-col gap-2.5">
-                  <div className="text-[11px] font-sans font-bold text-amber-900/70 select-none flex items-center gap-1 tracking-wider uppercase">
-                    <Layers className="w-3.5 h-3.5" />
-                    현재 디자인된 맞춤 설정 복제
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 mt-1">
-                    <div className="bg-white/80 p-2.5 rounded-xl border border-stone-100 shadow-sm">
-                      <span className="text-[9px] text-stone-500 font-medium font-sans">모델 프로필</span>
-                      <span className="text-xs font-bold text-stone-800 font-sans block mt-0.5 mt-0.5 truncate flex items-center gap-1">
-                        <span className="text-base select-none">{activeTab === 'character' ? selectedCharacter.avatar : '👤'}</span>
-                        {activeTab === 'character' ? selectedCharacter.name : '나의 촬영 사진'}
-                      </span>
-                    </div>
-
-                    <div className="bg-white/80 p-2.5 rounded-xl border border-stone-100 shadow-sm">
-                      <span className="text-[9px] text-stone-500 font-medium font-sans">의상 테마</span>
-                      <span className="text-xs font-bold text-rose-950 font-sans block mt-0.5 truncate">
-                        👗 {selectedHanbok ? selectedHanbok.title : '선택 없음'}
-                      </span>
-                    </div>
-
-                    <div className="bg-white/80 p-2.5 rounded-xl border border-stone-100 shadow-sm col-span-2 flex items-center justify-between gap-4">
-                      <div>
-                        <span className="text-[9px] text-stone-500 font-medium font-sans block">장신구 및 조율 색채</span>
-                        <span className="text-xs font-bold text-stone-800 font-sans block mt-0.5 truncate">
-                          👑 {selectedAccessory ? selectedAccessory.title : '모자 선택 없음'}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 flex-none bg-stone-150 px-2 py-1 rounded-lg">
-                        <span
-                          className="w-3 h-3 rounded-full border border-black/10 inline-block shadow-inner"
-                          style={{ backgroundColor: dyeColor }}
-                        />
-                        <span className="text-[10px] font-mono text-stone-600">{dyeColor}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Backdrop Settings options */}
-                <div className="mt-5">
-                  <span className="text-[11px] font-sans font-bold text-stone-500 uppercase tracking-widest flex items-center gap-1 select-none">
-                    🏞️ 화보 배경 테마 선택
-                  </span>
-                  
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    {[
-                      { id: 'palace', name: '🏰 궁궐 앞뜰', desc: '경복궁 근정전 정원 조명' },
-                      { id: 'garden', name: '🌸 매화 정원', desc: '화창한 낙원 매화 꽃밭' },
-                      { id: 'night', name: '🏮 은은한 야경', desc: '청사초롱과 영롱한 달빛' },
-                      { id: 'studio', name: '📸 전통 스튜디오', desc: '창살 스크린의 현대 프로필' },
-                    ].map((style) => {
-                      const isStyleSelected = conceptStyle === style.id;
-                      return (
-                        <button
-                          key={style.id}
-                          onClick={() => setConceptStyle(style.id as any)}
-                          className={`p-3 rounded-xl text-left border transition-all cursor-pointer select-none ${
-                            isStyleSelected
-                              ? 'bg-amber-900 text-amber-50 border-amber-900 font-semibold ring-1 ring-amber-700/30'
-                              : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
-                          }`}
-                        >
-                          <div className="text-xs font-sans font-semibold mb-0.5">{style.name}</div>
-                          <div className={`text-[9px] font-sans truncate ${isStyleSelected ? 'text-amber-200/90' : 'text-stone-400'}`}>
-                            {style.desc}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Framing & Size Ratio Settings */}
-                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Framing Option */}
-                  <div>
-                    <span className="text-[11px] font-sans font-bold text-stone-500 uppercase tracking-widest flex items-center gap-1 select-none">
-                      📐 화보 구도 선택
-                    </span>
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        onClick={() => setFraming('full')}
-                        className={`flex-1 py-2 px-3 rounded-xl border text-xs font-sans font-semibold transition-all cursor-pointer text-center ${
-                          framing === 'full'
-                            ? 'bg-amber-900 text-amber-50 border-amber-900 shadow'
-                            : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
-                        }`}
-                      >
-                        전체 모습 (전신)
-                      </button>
-                      <button
-                        onClick={() => setFraming('half')}
-                        className={`flex-1 py-2 px-3 rounded-xl border text-xs font-sans font-semibold transition-all cursor-pointer text-center ${
-                          framing === 'half'
-                            ? 'bg-amber-900 text-amber-50 border-amber-900 shadow'
-                            : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
-                        }`}
-                      >
-                        상반신 집중
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Aspect Ratio Option */}
-                  <div>
-                    <span className="text-[11px] font-sans font-bold text-stone-500 uppercase tracking-widest flex items-center gap-1 select-none">
-                      🖼️ 크기 비율 조절
-                    </span>
-                    <div className="grid grid-cols-2 gap-1.5 mt-2">
-                      {[
-                        { id: '1:1', name: '정사각형 (1:1)' },
-                        { id: '3:4', name: '세로형 (3:4)' },
-                        { id: '9:16', name: '스마트폰 (9:16)' },
-                        { id: '4:3', name: '가로형 (4:3)' },
-                      ].map((ratio) => (
-                        <button
-                          key={ratio.id}
-                          onClick={() => setAspectRatio(ratio.id)}
-                          className={`py-1.5 px-2 rounded-lg border text-[11px] font-sans font-semibold transition-all cursor-pointer text-center ${
-                            aspectRatio === ratio.id
-                              ? 'bg-amber-900 text-amber-50 border-amber-900 shadow'
-                              : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
-                          }`}
-                        >
-                          {ratio.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Image Resolution Settings */}
-                <div className="mt-4">
-                  <span className="text-[11px] font-sans font-bold text-stone-500 uppercase tracking-widest flex items-center gap-1 select-none">
-                    ✨ 이미지 해상도 화질
-                  </span>
-                  <div className="flex gap-2 mt-2">
-                    {[
-                      { id: '512px', name: '512px (빠른 생성)' },
-                      { id: '1K', name: '1K (표준 고해상도)' },
-                      { id: '2K', name: '2K (초고화질 프로필)' },
-                    ].map((sz) => (
-                      <button
-                        key={sz.id}
-                        onClick={() => setImageSize(sz.id)}
-                        className={`flex-1 py-1.5 px-2.5 rounded-xl border text-[11px] font-sans font-semibold transition-all cursor-pointer text-center ${
-                          imageSize === sz.id
-                            ? 'bg-amber-900 text-amber-50 border-amber-900 shadow'
-                            : 'bg-white hover:bg-stone-50 text-stone-700 border-stone-200'
-                        }`}
-                      >
-                        {sz.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* API Core trigger button */}
-              <div className="mt-6 border-t border-amber-900/10 pt-4">
-                <button
-                  id="btn-trigger-ai-drawing"
-                  onClick={generateAiPortrait}
-                  disabled={isAiGenerating}
-                  className={`w-full py-4 rounded-2xl text-sm font-sans font-bold tracking-wide shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border ${
-                    isAiGenerating
-                      ? 'bg-amber-100 text-amber-800 border-amber-200 cursor-wait'
-                      : 'bg-amber-900 hover:bg-amber-950 text-amber-50 border-amber-950 active:scale-95'
-                  }`}
-                >
-                  {isAiGenerating ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-amber-800" />
-                      붓자국을 누비는 중... (3~7초 소요)
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-                      실사 한복 화보 그리기 (이용료 0원)
-                    </>
-                  )}
-                </button>
-                <div className="text-[10px] text-center text-stone-450 mt-2 font-sans select-none">
-                  ※ Google Gemini AI 서버 결합 처리로 별도의 추가 금전 결제나 크레딧이 들지 않는 안심 체험 기능입니다.
-                </div>
-              </div>
-            </div>
-
-            {/* RIGHT SIDE: Art Canvas Live Output Display */}
-            <div className="w-full md:w-1/2 p-6 md:p-8 bg-[#FAF6EE] flex flex-col items-center justify-center relative min-h-[350px] md:min-h-[450px] overflow-y-auto">
-              {/* Decorative design corner overlays */}
-              <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-amber-900/20 pointer-events-none" />
-              <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-amber-900/20 pointer-events-none" />
-              <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-amber-900/20 pointer-events-none" />
-              <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-amber-900/20 pointer-events-none" />
-
-              <AnimatePresence mode="wait">
-                {isAiGenerating ? (
-                  /* Animated paint loading placeholder */
-                  <motion.div
-                    key="drawing-loading"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="flex flex-col items-center text-center p-8 max-w-sm"
-                  >
-                    <div className="relative w-16 h-16 flex items-center justify-center">
-                      <div className="absolute inset-0 rounded-full border-4 border-amber-200/50 animate-ping" />
-                      <div className="absolute inset-0 rounded-full border-t-4 border-amber-850 animate-spin" />
-                      <span className="text-2xl animate-bounce">🖌️</span>
-                    </div>
-
-                    <h4 className="font-sans font-bold text-amber-900 mt-5">
-                      한복 실사 화보 비단 제작중
-                    </h4>
-                    <p className="text-[11px] text-stone-600 font-sans leading-relaxed mt-2.5">
-                      선택하신 전통 장신구 품목과 한복 비단 자수 결을 전통 수채 도학 기반으로 한 땀 한 땀 승화 중입니다. 잠시만 기다려 주세요...
-                    </p>
-                  </motion.div>
-                ) : aiError ? (
-                  /* Error Notice view */
-                  <motion.div
-                    key="drawing-error"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex flex-col items-center text-center p-6 border-2 border-rose-200 bg-rose-50 rounded-2xl max-w-md"
-                  >
-                    <span className="text-3xl select-none">🏮</span>
-                    <h4 className="font-sans font-bold text-rose-950 mt-3">생성 오류가 발생했습니다</h4>
-                    
-                    {aiError.includes("RESOURCE_EXHAUSTED_LIMIT_0_NEED_PAID_KEY") ? (
-                      <div className="text-left mt-3 p-4 bg-white/90 border border-rose-200 rounded-xl text-xs text-stone-700 leading-relaxed shadow-sm">
-                        <div className="font-extrabold text-rose-950 mb-1.5 flex items-center gap-1">
-                          <span>💡</span> Gemini AI 화보 모델 안내
-                        </div>
-                        <p className="mb-2">
-                          실사 한복 화보 생성 기능은 Google의 최신 고해상도 AI 모델인 <strong>gemini-3.1-flash-image</strong>를 활용하는 프리미엄 서비스입니다.
-                        </p>
-                        <p className="mb-2">
-                          현재 설정된 API 키가 <strong>무료 요금제(Free-tier)</strong> 상태이거나 한도가 초과되어 작동하지 않을 수 있습니다.
-                        </p>
-                        <div className="font-bold text-stone-900 mt-2.5 mb-1">🔧 해결 방법:</div>
-                        <ol className="list-decimal pl-4 space-y-1 text-stone-600 font-medium">
-                          <li>화면 우측 상단의 <strong>Settings &gt; Secrets</strong> 메뉴를 클릭합니다.</li>
-                          <li>등록하신 <strong>GEMINI_API_KEY</strong>에 신용카드/결제 계정(Billing)을 연동하여 <strong>종량제(Paid-tier) 요금제</strong>로 전환하시면 즉시 고해상도 화보를 무제한으로 그리실 수 있습니다.</li>
-                        </ol>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-rose-850 leading-relaxed font-sans mt-2">
-                        {aiError}
-                      </p>
-                    )}
-                    
-                    <button
-                      onClick={generateAiPortrait}
-                      className="mt-4 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold font-sans transition-all active:scale-95 cursor-pointer"
-                    >
-                      다시 시도하기
-                    </button>
-                  </motion.div>
-                ) : aiImageUrl ? (
-                  /* Success masterpiece display */
-                  <motion.div
-                    key="drawing-done"
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    className="w-full flex flex-col items-center gap-4"
-                  >
-                    {/* Antique luxury dark wood mount picture frame */}
-                    <div className="relative p-2.5 bg-[#2B1B04] border-4 border-amber-950 shadow-2xl rounded-2xl w-full max-w-[320px] aspect-square overflow-hidden flex items-center justify-center">
-                      <div className="w-full h-full bg-[#FCF8F2] overflow-hidden rounded-lg shadow-inner relative">
-                        <img
-                          src={aiImageUrl}
-                          alt="AI Hanbok Masterpiece Portrait"
-                          className="w-full h-full object-cover"
-                          referrerPolicy="no-referrer"
-                        />
-                        {/* Premium luxury stamp overlay watermark */}
-                        <div className="absolute bottom-2.5 right-2.5 bg-rose-800 text-white font-serif font-semibold text-[9px] px-2 py-1 border border-amber-200/40 rounded shadow select-none leading-none flex items-center gap-0.5">
-                          <span>🏮</span>
-                          <span>AI 화방원</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="px-4 text-center">
-                      <h4 className="font-sans font-extrabold text-stone-900 text-sm">
-                        🌸 완공된 신선 한복 화보
-                      </h4>
-                      <p className="text-[11px] text-stone-600 font-sans tracking-wide leading-relaxed mt-1 text-center italic">
-                        &ldquo;{aiCommentary}&rdquo;
-                      </p>
-                    </div>
-
-                    {/* Actions and Save button */}
-                    <div className="flex gap-2 w-full max-w-[320px] mt-1">
-                      <button
-                        onClick={downloadAiPortrait}
-                        className="flex-1 py-3 px-4 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-sans font-bold flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
-                      >
-                        <Download className="w-4 h-4 cursor-pointer" />
-                        화보 저장하기
-                      </button>
-                      <button
-                        onClick={() => {
-                          setAiImageUrl(null);
-                          setAiCommentary('');
-                          setAiError(null);
-                        }}
-                        className="px-4 py-3 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded-xl text-xs font-sans font-semibold transition-all active:scale-95 cursor-pointer"
-                      >
-                        다른 연출
-                      </button>
-                    </div>
-                  </motion.div>
-                ) : (
-                  /* Initial default onboarding display */
-                  <motion.div
-                    key="drawing-idle"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex flex-col items-center text-center p-6"
-                  >
-                    <div className="w-20 h-20 rounded-full bg-amber-50 border border-amber-200/60 flex items-center justify-center shadow-inner text-3xl select-none animate-pulse">
-                      🎑
-                    </div>
-                    <h4 className="font-sans font-bold text-amber-950 mt-4 leading-none">
-                      고품격 실사 화보 전시관
-                    </h4>
-                    <p className="text-[11px] text-stone-500 font-sans leading-relaxed max-w-sm mt-2.5">
-                      왼쪽 기획실에서 마음에 드는 단아한 <strong>배경 테마</strong>를 선택하고, 하단의 <strong>'실사 한복 화보 그리기'</strong> 버튼을 클릭하여 인공지능이 실제 질감으로 곱게 복장을 입혀 재구성한 눈부신 한복 사진을 즉시 맞이하세요.
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
   </>
 );
 };
