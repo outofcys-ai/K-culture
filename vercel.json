@@ -1,0 +1,16 @@
+{
+  "buildCommand": "npm run build:all",
+  "outputDirectory": "dist",
+  "installCommand": "npm install && cd k-wave && npm install && cd ../HanBok && npm install",
+  "functions": {
+    "api/*.ts": {
+      "runtime": "@vercel/node"
+    }
+  },
+  "rewrites": [
+    { "source": "/k-wave/(.*)", "destination": "/k-wave/$1" },
+    { "source": "/hanbok/(.*)", "destination": "/hanbok/$1" },
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/((?!k-wave|hanbok|api|assets).*)", "destination": "/index.html" }
+  ]
+}
