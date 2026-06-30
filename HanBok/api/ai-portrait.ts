@@ -1,5 +1,4 @@
-// HanBok AI 화보 생성 Vercel 서버리스 함수
-import { GoogleGenAI } from "@google/genai";
+// HanBok AI 화보 생성 Vercel 서버리스 함수 (Pollinations.ai 무료 이미지 생성, API 키 불필요)
 
 function getHexColorName(hex: string): string {
   if (!hex) return "exquisite traditional Korean color scheme";
@@ -15,24 +14,41 @@ function getHexColorName(hex: string): string {
   return `traditional refined color tone (${hex})`;
 }
 
+// 비율 + 해상도 → 픽셀 크기 (긴 변 기준). 서버리스 타임아웃을 고려해 상한을 둔다.
+function getDimensions(aspectRatio: string, imageSize: string): { width: number; height: number } {
+  const base = imageSize === "512px" ? 512 : imageSize === "2K" ? 1280 : 1024;
+  switch (aspectRatio) {
+    case "3:4":
+      return { width: Math.round((base * 3) / 4), height: base };
+    case "9:16":
+      return { width: Math.round((base * 9) / 16), height: base };
+    case "4:3":
+      return { width: base, height: Math.round((base * 3) / 4) };
+    case "1:1":
+    default:
+      return { width: base, height: base };
+  }
+}
+
+function buildCommentary(conceptStyle: string): string {
+  if (conceptStyle === "garden") return "흐드러진 매화 정원에서 고운 한복 자락이 봄볕에 물들었습니다.";
+  if (conceptStyle === "night") return "청사초롱 은은한 달빛 아래, 단아한 한복의 자태가 빛납니다.";
+  if (conceptStyle === "studio") return "정갈한 전통 스튜디오에서 완성한 고품격 한복 화보입니다.";
+  return "고궁 앞뜰의 황금빛 햇살 속, 기품 있는 한복 화보가 완성되었습니다.";
+}
+
 export default async function handler(req: any, res: any) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return res.status(400).json({ error: "GEMINI_API_KEY이 설정되지 않았습니다." });
-  }
-
   try {
     const {
-      characterName, activeTab, userPhotoData,
-      hanbokTitle, accessoryTitle, dyeColor,
+      characterName, activeTab,
+      accessoryTitle, dyeColor,
       conceptStyle, aspectRatio, imageSize, framing,
     } = req.body;
 
-    const ai = new GoogleGenAI({ apiKey, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
     const colorDesc = getHexColorName(dyeColor);
 
     let backdropStr = "inside the beautiful front courtyard of a historic Joseon Dynasty Hanok palace, surrounded by glowing golden daylight.";
@@ -41,66 +57,39 @@ export default async function handler(req: any, res: any) {
     else if (conceptStyle === "studio") backdropStr = "a premium, minimalist photographic studio backdrop with traditional Korean handcraft screens, wooden frame, and professional gentle studio lighting gradient.";
 
     const framingPrompt = framing === "half"
-      ? "Composition style: A gorgeous half-body portrait / medium shot from the waist up."
-      : "Crucial composition style: Generate a complete standing FULL-BODY portrait showing the person/character gracefully from head to toe. The entire Hanbok outfit must be fully visible in the frame.";
+      ? "A gorgeous half-body portrait, medium shot from the waist up."
+      : "A complete standing FULL-BODY portrait from head to toe, the entire Hanbok outfit fully visible, centered with spacing so nothing is cropped.";
 
     let promptText = "";
-    if (activeTab === "myphoto" && userPhotoData) {
-      promptText = `Generate an ultra-realistic, photorealistic high-fidelity masterpiece portrait of the person shown in the reference face photo, realistically dressed up in an exquisite, luxurious royal Korean traditional Hanbok.
-      The Hanbok features beautiful intricate silken patterns and embroideries, with key fabric tone of lovely ${colorDesc}.
-      The person is wearing the traditional accessory: "${accessoryTitle || "none"}".
-      The background must be: ${backdropStr}
-      ${framingPrompt}
-      Crucial: The generated person's facial structure must strictly respect the reference image to maintain close identity. Gorgeous professional photography, 8k resolution, photorealistic, sharp focus.`;
+    if (activeTab === "myphoto") {
+      // Pollinations는 업로드 얼굴 보존(img2img)이 어려워 텍스트 기반 한복 인물 화보로 생성한다.
+      promptText = `Ultra-realistic, photorealistic high-fidelity masterpiece portrait of an elegant young Korean person dressed in an exquisite luxurious royal Korean traditional Hanbok with intricate silk patterns, key fabric tone of ${colorDesc}, wearing the traditional accessory "${accessoryTitle || "none"}". Background: ${backdropStr} ${framingPrompt} Gorgeous professional photography, 8k, sharp focus, natural volumetric light.`;
     } else {
       const animalType = (characterName || "rabbit").includes("토끼") ? "adorable white fluffy bunny rabbit"
         : (characterName || "").includes("야옹") ? "charming sleek white cat" : "fluffy cuddly brown baby bear";
-      promptText = `An incredibly cute, photorealistic 3D rendering of an adorable fluffy anthropomorphic ${animalType} character, standing on two legs, wearing a fully detailed Korean traditional luxury Hanbok.
-      The Hanbok is beautifully custom dyed in gorgeous ${colorDesc} with shiny intricate golden royal embroideries.
-      The cute character is wearing ${accessoryTitle || "nothing"} on its head.
-      The background setting is: ${backdropStr}
-      ${framingPrompt}
-      High-end 3D visual, Pixar or realist hybrid aesthetic, fluffy soft fur textures, masterpiece illustration.`;
+      promptText = `An incredibly cute photorealistic 3D rendering of an adorable fluffy anthropomorphic ${animalType} character standing on two legs, wearing a fully detailed Korean traditional luxury Hanbok custom dyed in gorgeous ${colorDesc} with shiny golden royal embroideries, wearing ${accessoryTitle || "nothing"} on its head. Background: ${backdropStr} ${framingPrompt} High-end 3D visual, Pixar-style, fluffy soft fur, big bright warm eyes, volumetric lighting, masterpiece.`;
     }
 
-    const chosenAspect = aspectRatio || "1:1";
-    const chosenSize = imageSize || "1K";
+    const { width, height } = getDimensions(aspectRatio || "1:1", imageSize || "1K");
+    const seed = Math.floor(Math.random() * 1_000_000);
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptText)}?width=${width}&height=${height}&seed=${seed}&nologo=true&model=flux`;
 
-    const contents: any = activeTab === "myphoto" && userPhotoData
-      ? {
-          parts: [
-            { inlineData: { data: userPhotoData.includes(",") ? userPhotoData.split(",")[1] : userPhotoData, mimeType: "image/png" } },
-            { text: promptText },
-          ],
-        }
-      : { parts: [{ text: promptText }] };
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-image",
-      contents,
-      config: { imageConfig: { aspectRatio: chosenAspect, imageSize: chosenSize } },
-    });
-
-    let generatedImageBase64 = null;
-    let modelSpeech = "";
-    for (const part of response?.candidates?.[0]?.content?.parts || []) {
-      if ((part as any).inlineData) generatedImageBase64 = (part as any).inlineData.data;
-      else if (part.text) modelSpeech += part.text;
+    const imgResp = await fetch(url);
+    if (!imgResp.ok) {
+      throw new Error(`이미지 생성 서버 응답 오류 (${imgResp.status})`);
     }
 
-    if (!generatedImageBase64) throw new Error("AI가 이미지를 생성하지 못했습니다.");
+    const arrayBuf = await imgResp.arrayBuffer();
+    const base64 = Buffer.from(arrayBuf).toString("base64");
+    const mime = imgResp.headers.get("content-type") || "image/jpeg";
 
     res.json({
       success: true,
-      imageData: `data:image/png;base64,${generatedImageBase64}`,
-      commentary: modelSpeech || "한복 화보가 완성되었습니다!",
+      imageData: `data:${mime};base64,${base64}`,
+      commentary: buildCommentary(conceptStyle),
     });
   } catch (error: any) {
     console.error("AI Portrait Error:", error);
-    let errorMsg = error.message || "AI 생성 중 오류가 발생했습니다.";
-    if (errorMsg.includes("quota") || errorMsg.includes("RESOURCE_EXHAUSTED")) {
-      errorMsg = "API 할당량을 초과했습니다. 잠시 후 다시 시도해 주세요.";
-    }
-    res.status(500).json({ error: errorMsg });
+    res.status(500).json({ error: error.message || "AI 화보 생성 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요." });
   }
 }
