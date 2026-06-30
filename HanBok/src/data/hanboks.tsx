@@ -18,6 +18,7 @@ export const HANBOKS: HanbokItem[] = [
     gender: 'female',
     defaultScale: 1.15,
     defaultYOffset: 202,
+    necklineFromTop: 30,
     render: (scale, colorAccent) => (
       <TransparentHanbok
         src={imgRoyalDangui}
@@ -33,6 +34,7 @@ export const HANBOKS: HanbokItem[] = [
     gender: 'female',
     defaultScale: 1.15,
     defaultYOffset: 200,
+    necklineFromTop: 30,
     render: (scale, colorAccent) => (
       <TransparentHanbok
         src={imgPastelFusion}
@@ -48,6 +50,7 @@ export const HANBOKS: HanbokItem[] = [
     gender: 'male',
     defaultScale: 1.15,
     defaultYOffset: 205,
+    necklineFromTop: 25,
     render: (scale, colorAccent) => (
       <TransparentHanbok
         src={imgScholarDopo}
@@ -63,6 +66,7 @@ export const HANBOKS: HanbokItem[] = [
     gender: 'unisex',
     defaultScale: 1.1,
     defaultYOffset: 200,
+    necklineFromTop: 30,
     render: (scale, colorAccent) => (
       <TransparentHanbok
         src={imgKidsSaekdong}
@@ -78,6 +82,7 @@ export const HANBOKS: HanbokItem[] = [
     gender: 'male',
     defaultScale: 1.15,
     defaultYOffset: 205,
+    necklineFromTop: 25,
     render: (scale, colorAccent) => (
       <TransparentHanbok
         src={imgGoldYongpo}
@@ -93,6 +98,7 @@ export const HANBOKS: HanbokItem[] = [
     gender: 'female',
     defaultScale: 1.1,
     defaultYOffset: 200,
+    necklineFromTop: 30,
     render: (scale, colorAccent) => (
       <TransparentHanbok
         src={imgYellowTraditional}

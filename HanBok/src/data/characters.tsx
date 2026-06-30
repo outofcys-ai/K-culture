@@ -9,6 +9,8 @@ export const CHARACTERS: Character[] = [
     avatar: '🐰',
     defaultHanbokScale: 1.05,
     defaultHanbokYOffset: 25,
+    headTopOffset: -7,
+    headRadius: 70,
     render: (color = '#F8FAFC') => (
       <svg
         id="char-svg-duri"
@@ -97,6 +99,8 @@ export const CHARACTERS: Character[] = [
     avatar: '🧸',
     defaultHanbokScale: 1.15,
     defaultHanbokYOffset: 12,
+    headTopOffset: -5,
+    headRadius: 68,
     render: (color = '#DDB892') => (
       <svg
         id="char-svg-maro"
@@ -161,6 +165,8 @@ export const CHARACTERS: Character[] = [
     avatar: '🐥',
     defaultHanbokScale: 1.12,
     defaultHanbokYOffset: 5,
+    headTopOffset: -12,
+    headRadius: 70,
     render: (color = '#FDE047') => (
       <svg
         id="char-svg-soli"
@@ -225,6 +231,8 @@ export const CHARACTERS: Character[] = [
     avatar: '👧',
     defaultHanbokScale: 1.05,
     defaultHanbokYOffset: 20,
+    headTopOffset: -5,
+    headRadius: 68,
     render: (color = '#FFEAD2') => (
       <svg
         id="char-svg-sohee"
@@ -294,6 +302,8 @@ export const CHARACTERS: Character[] = [
     avatar: '👦',
     defaultHanbokScale: 1.05,
     defaultHanbokYOffset: 20,
+    headTopOffset: -5,
+    headRadius: 68,
     render: (color = '#FFEAD2') => (
       <svg
         id="char-svg-minjun"

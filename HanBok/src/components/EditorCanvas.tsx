@@ -433,159 +433,71 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
     });
   };
 
-  // Smart auto-fitting logic to automatically align character, hanbok, and accessory proportions beautifully
+  // 수학 공식 기반 자동 맞춤:
+  // - 캐릭터 머리 꼭대기: charY + headTopOffset
+  // - 한복 목선 정렬: hanbokY = charY + (140 + 120) - necklineFromTop
+  //   (140 = 한복 컨테이너 반높이, 120 = 캐릭터 컨테이너 반높이 = 턱 위치)
+  // - 갓/족두리 배치: accY = headTopY - hatBrimFromCenter + 5(소폭 겹침)
   const applySmartFitting = () => {
     setActivePresetFit('smart');
-    
-    // 1. Reset Character to center nicely
-    setCharacterTransform({
-      x: 0,
-      y: 45,
-      scale: 1.0,
-      rotation: 0,
-      flipX: false,
-      opacity: 1,
-    });
 
-    // 2. Beautifully align Hanbok depending on character properties & hanbok custom scale offsets
+    const charY = 45;
+    setCharacterTransform({ x: 0, y: charY, scale: 1.0, rotation: 0, flipX: false, opacity: 1 });
+
     if (selectedHanbok) {
-      let baseScale = selectedCharacter.defaultHanbokScale || 1.0;
-      
-      // Micro scales adjustments based on unique hanbok types to prevent neck margins
-      if (selectedHanbok.id === 'modern_saenghwal') {
-        baseScale *= 0.96;
-      } else if (selectedHanbok.id === 'scholar_dopo') {
-        baseScale *= 1.02;
-      } else if (selectedHanbok.id === 'kids_saekdong') {
-        baseScale *= 0.98;
-      }
-
-      let baseY = (selectedCharacter.defaultHanbokYOffset || 20) - 160;
-      
-      // Specific hanbok vertical placement offsets
-      if (selectedHanbok.id === 'royal_dangui') {
-        baseY += 5;
-      } else if (selectedHanbok.id === 'modern_saenghwal') {
-        baseY += 10;
-      } else if (selectedHanbok.id === 'kids_saekdong') {
-        baseY += 3;
-      } else if (selectedHanbok.id === 'gold_yongpo') {
-        baseY += 4;
-      }
-
-      setHanbokTransform({
-        x: 0,
-        y: baseY,
-        scale: baseScale,
-        rotation: 0,
-        flipX: false,
-        opacity: 1,
-      });
+      const necklineFromTop = selectedHanbok.necklineFromTop ?? 30;
+      // 턱(charY+120)이 한복 목선과 일치하도록: hanbokCenter = chinY + 140 - necklineFromTop
+      const hanbokY = charY + 120 + 140 - necklineFromTop;
+      const hanbokScale = selectedCharacter.defaultHanbokScale * (selectedHanbok.defaultScale || 1.0);
+      setHanbokTransform({ x: 0, y: hanbokY, scale: hanbokScale, rotation: 0, flipX: false, opacity: 1 });
     }
 
-    // 3. Intelligently position accessories based on specific category / id & character head level
     if (selectedAccessory) {
+      const { headTopOffset, headRadius } = selectedCharacter;
+      const headTopY = charY + headTopOffset; // 캔버스 기준 머리 꼭대기 Y
+      const accId = selectedAccessory.id;
       let accX = 0;
       let accY = 0;
-      let accScale = selectedAccessory.defaultScale || 1.0;
+      let accScale = 1.0;
 
-      const charId = selectedCharacter.id;
-      const accId = selectedAccessory.id;
+      if (accId === 'gat_hat') {
+        // 갓 챙 하단(컨테이너 중심 +43px)을 머리 꼭대기에 살짝 겹치게 배치
+        const brimFromCenter = 43;
+        accY = headTopY - brimFromCenter + 5;
+        // 챙 너비(170px)를 머리 폭에 맞춤
+        accScale = (headRadius * 2) / 170;
 
-      if (accId === 'norigae_pendant') {
-        // Norigae is typically placed near the front coat strings (Otgoreum)
-        accScale = 0.55;
-        accX = 18; 
-        if (charId === 'duri') { accY = 32; }
-        else if (charId === 'maro') { accY = 22; }
-        else if (charId === 'soli') { accY = 12; }
-        else if (charId === 'sohee') { accY = 28; }
-        else if (charId === 'minjun') { accY = 28; }
-        else { accY = 30; } // default / photo
-      } else if (accId === 'daenggi_ribbon') {
-        // Daenggi is a long ribbon at the back of the braid or side hair
-        accScale = 0.75;
-        accX = 35; 
-        if (charId === 'duri') { accY = -45; }
-        else if (charId === 'maro') { accY = -40; }
-        else if (charId === 'soli') { accY = -25; }
-        else if (charId === 'sohee') { accY = -35; accX = 0; } // Center back braid for Sohee
-        else if (charId === 'minjun') { accY = -35; }
-        else { accY = -35; }
-      } else if (accId === 'gat_hat') {
-        // Gat scholar hat fits on top of head
-        accScale = 1.0;
-        if (charId === 'duri') {
-          accScale = 1.1;
-          accY = -125;
-        } else if (charId === 'maro') {
-          accScale = 1.15;
-          accY = -118;
-        } else if (charId === 'soli') {
-          accScale = 1.1;
-          accY = -110;
-        } else if (charId === 'sohee') {
-          accScale = 1.0;
-          accY = -112;
-        } else if (charId === 'minjun') {
-          accScale = 1.0;
-          accY = -115;
-        } else {
-          accY = -110;
-        }
       } else if (accId === 'jokduri_crown') {
-        // Queen Jokduri crown sits beautifully at center
+        // 족두리 하단(컨테이너 중심 +25px)을 머리 꼭대기에 맞춤
+        const crownBottomFromCenter = 25;
+        accY = headTopY - crownBottomFromCenter + 5;
         accScale = 0.8;
-        if (charId === 'duri') {
-          accY = -115;
-        } else if (charId === 'maro') {
-          accScale = 0.85;
-          accY = -112;
-        } else if (charId === 'soli') {
-          accScale = 0.85;
-          accY = -105;
-        } else if (charId === 'sohee') {
-          accScale = 0.75;
-          accY = -110;
-        } else if (charId === 'minjun') {
-          accScale = 0.75;
-          accY = -110;
-        } else {
-          accY = -110;
-        }
+
       } else if (accId === 'baessi_daenggi') {
-        // Baessi hairband sits right on top of front forehead
+        // 배씨댕기는 이마 위치(머리 꼭대기 + 반지름 60%)에 배치
+        const foreheadY = headTopY + headRadius * 0.6;
+        const bandFromCenter = 25;
+        accY = foreheadY - bandFromCenter;
         accScale = 0.85;
-        if (charId === 'duri') {
-          accY = -112;
-        } else if (charId === 'maro') {
-          accScale = 0.9;
-          accY = -108;
-        } else if (charId === 'soli') {
-          accScale = 0.9;
-          accY = -100;
-        } else if (charId === 'sohee') {
-          accScale = 0.8;
-          accY = -104;
-        } else if (charId === 'minjun') {
-          accScale = 0.8;
-          accY = -104;
-        } else {
-          accY = -105;
-        }
+
+      } else if (accId === 'daenggi_ribbon') {
+        // 댕기는 머리 옆/뒤에서 아래로 늘어짐
+        accX = 35;
+        accY = headTopY + headRadius * 0.5;
+        accScale = 0.75;
+
+      } else if (accId === 'norigae_pendant') {
+        // 노리개는 한복 옷고름 위치(가슴 앞)
+        accX = 18;
+        accY = charY + 90;
+        accScale = 0.55;
+
       } else {
         accY = (selectedAccessory.defaultYOffset || 80) - 180;
         accScale = selectedAccessory.defaultScale || 0.9;
       }
 
-      setAccessoryTransform({
-        x: accX,
-        y: accY,
-        scale: accScale,
-        rotation: 0,
-        flipX: false,
-        opacity: 1,
-      });
+      setAccessoryTransform({ x: accX, y: accY, scale: accScale, rotation: 0, flipX: false, opacity: 1 });
     }
   };
 
