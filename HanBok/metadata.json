@@ -1,0 +1,6 @@
+{
+  "name": "꼬마 한복 스튜디오",
+  "description": "귀여운 가상 캐릭터 또는 본인이 직접 촬영한 사진 위에 다채롭고 아름다운 여러 전통/현대 한복을 조화롭게 입혀보고 소장하는 앱입니다.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

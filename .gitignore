@@ -1,0 +1,19 @@
+node_modules/
+dist/
+dist-verify/
+build/
+coverage/
+.DS_Store
+*.log
+.vite-cache/
+
+# 환경변수 — Vercel에서 별도 설정
+.env
+.env.local
+.env.*.local
+
+# 하위 프로젝트 .env도 제외 (각 폴더 .gitignore와 중복 방어)
+k-wave/.env
+k-wave/.env.local
+HanBok/.env
+HanBok/.env.local

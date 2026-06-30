@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Gowun Batang", Georgia, serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-paper-white: #fcfbfa;
+  --color-paper-dark: #f5f3ef;
+  --color-ink-black: #161514;
+  --color-ink-dark: #2c2927;
+  --color-ink-medium: #3a3633;
+  --color-ink-light: #5d5651;
+  --color-clay: #b24d38;
+  --color-celadon: #3b6b55;
+}
+
+body {
+  background-color: var(--color-paper-white);
+  color: var(--color-ink-black);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar matching paper aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-paper-white);
+}
+::-webkit-scrollbar-thumb {
+  background: #d4cfc8;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #baa291;
+}
+

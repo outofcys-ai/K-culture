@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>정답 없는 정 퀴즈</title>
+  <style>
+    :root {
+      --bg: #f5efe6;
+      --card: #fffaf2;
+      --ink: #2b2118;
+      --muted: #78695a;
+      --line: #e1d2bf;
+      --accent: #8a4a31;
+      --accent2: #d8844d;
+      --soft: #f2e1cd;
+      --good: #3e7a50;
+      --bad: #a6493f;
+      --shadow: rgba(67, 41, 25, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(216,132,77,.22), transparent 34%),
+        linear-gradient(180deg, #fbf4eb, var(--bg));
+      color: var(--ink);
+    }
+
+    .wrap {
+      width: min(920px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 28px 0;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-end;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 6vw, 64px);
+      letter-spacing: -0.07em;
+      line-height: 1;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    button {
+      border: 0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 22px var(--shadow);
+      transition: transform .08s ease, filter .12s ease;
+      font-size: 15px;
+    }
+
+    button:hover { filter: brightness(1.04); }
+    button:active { transform: translateY(1px); }
+    button.secondary { background: #6f6257; }
+
+    .card {
+      background: rgba(255,250,242,.95);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: 0 20px 48px var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: clamp(24px, 5vw, 46px);
+    }
+
+    .hero h2 {
+      margin: 0 0 14px;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: -0.06em;
+    }
+
+    .hero p {
+      font-size: 18px;
+      line-height: 1.75;
+      color: var(--muted);
+      margin: 0 0 22px;
+    }
+
+    .hero .quote {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      color: var(--ink);
+      margin: 18px 0;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .quiz {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      min-height: 620px;
+    }
+
+    .main {
+      padding: clamp(22px, 4vw, 38px);
+      border-right: 1px solid var(--line);
+    }
+
+    .side {
+      padding: 24px;
+      background: rgba(242,225,205,.42);
+    }
+
+    .progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .bar {
+      flex: 1;
+      height: 12px;
+      background: #ead9c7;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+
+    .count {
+      font-weight: 900;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .tag {
+      display: inline-flex;
+      width: fit-content;
+      background: #fff2dd;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 11px;
+      color: var(--accent);
+      font-weight: 900;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .question h2 {
+      margin: 0 0 14px;
+      font-size: clamp(26px, 4vw, 38px);
+      letter-spacing: -0.05em;
+    }
+
+    .situation {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      font-size: 19px;
+      line-height: 1.75;
+      white-space: pre-line;
+      margin-bottom: 18px;
+    }
+
+    .choices {
+      display: grid;
+      gap: 10px;
+    }
+
+    .choice {
+      text-align: left;
+      background: #3f3329;
+      display: block;
+      width: 100%;
+      line-height: 1.45;
+    }
+
+    .choice.correctish {
+      background: var(--good);
+    }
+
+    .choice.risky {
+      background: var(--bad);
+    }
+
+    .feedback {
+      margin-top: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      line-height: 1.7;
+    }
+
+    .feedback h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .feedback p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .delta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: var(--soft);
+      font-weight: 900;
+      color: var(--accent);
+      font-size: 13px;
+    }
+
+    .score-list {
+      display: grid;
+      gap: 13px;
+    }
+
+    .score {
+      background: #fffaf2;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 13px;
+    }
+
+    .score-head {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .mini-bar {
+      height: 10px;
+      background: #ead9c7;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .mini-bar > div {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+
+    .side h3 {
+      margin: 0 0 14px;
+      font-size: 20px;
+      letter-spacing: -0.03em;
+    }
+
+    .hint {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .result {
+      padding: clamp(26px, 5vw, 48px);
+    }
+
+    .result h2 {
+      margin: 0 0 14px;
+      font-size: clamp(34px, 6vw, 58px);
+      letter-spacing: -0.07em;
+      line-height: 1.05;
+    }
+
+    .result p {
+      font-size: 18px;
+      line-height: 1.8;
+      color: var(--muted);
+      white-space: pre-line;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 22px 0;
+    }
+
+    .result-score {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      font-weight: 900;
+    }
+
+    .result-score span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .hidden { display: none !important; }
+
+    footer {
+      margin-top: 14px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 780px) {
+      .top { flex-direction: column; align-items: flex-start; }
+      .quiz { grid-template-columns: 1fr; }
+      .main { border-right: 0; border-bottom: 1px solid var(--line); }
+      .result-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>정답 없는 정 퀴즈</h1>
+        <p class="subtitle">한국 사람들은 왜 자꾸 “밥 먹었어요?”라고 물을까?</p>
+      </div>
+      <button class="secondary" onclick="restart()">처음으로</button>
+    </div>
+
+    <section id="start" class="card hero">
+      <span class="tag">텍스트 MVP</span>
+      <h2>외국인이 한국인의 ‘정’을 상황으로 배우는 퀴즈</h2>
+      <p>
+        이 게임에는 완벽한 정답이 없습니다.
+        한국의 일상 상황에서 어떤 선택을 할지 고르면, 당신의 정 지수와 오지랖 지수, 배려 지수, 현실 감각이 달라집니다.
+      </p>
+      <div class="quote">
+        핵심은 “무조건 착하게 행동하기”가 아닙니다.<br>
+        상대를 기억하고, 부담스럽지 않게 챙기고, 오래 이어지는 마음을 이해하는 것입니다.
+      </div>
+      <button onclick="startQuiz()">시작하기</button>
+    </section>
+
+    <section id="quizCard" class="card quiz hidden">
+      <main class="main">
+        <div class="progress">
+          <div class="bar"><div id="progressBar"></div></div>
+          <div class="count" id="count">1 / 10</div>
+        </div>
+
+        <div class="question">
+          <span class="tag" id="category">상황</span>
+          <h2 id="title"></h2>
+          <div class="situation" id="situation"></div>
+          <div class="choices" id="choices"></div>
+          <div class="feedback hidden" id="feedback">
+            <h3 id="feedbackTitle"></h3>
+            <p id="feedbackText"></p>
+            <div class="delta" id="delta"></div>
+            <div class="actions">
+              <button onclick="nextQuestion()" id="nextBtn">다음 상황</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="side">
+        <h3>현재 성향</h3>
+        <div class="score-list" id="scoreList"></div>
+        <div class="hint">
+          정 지수만 높다고 좋은 결과가 나오지는 않습니다.
+          좋은 마음이 상대에게 부담이 되면 오지랖이 될 수 있습니다.
+        </div>
+      </aside>
+    </section>
+
+    <section id="resultCard" class="card result hidden"></section>
+
+    <footer>
+      MVP v0.1 · 단일 HTML · 상황 판단형 문화 퀴즈
+    </footer>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        category: "안부",
+        title: "밥은 먹었어요?",
+        situation: "한국인 친구가 당신에게 자주 “밥은 먹었어요?”라고 묻습니다.\n당신은 방금 밥을 먹었다고 말했는데도, 다음 날 또 묻습니다.\n\n이 말은 어떤 의미에 가까울까요?",
+        choices: [
+          {
+            text: "진짜 식사 여부만 확인하는 말이다.",
+            scores: { jeong: 0, care: 0, nosy: 0, real: 1 },
+            tone: "neutral",
+            feedback: "틀렸다고 할 수는 없지만, 한국어에서 이 말은 식사 질문을 넘어 안부 표현으로 자주 쓰입니다."
+          },
+          {
+            text: "당신의 건강과 안부를 묻는 말이다.",
+            scores: { jeong: 2, care: 2, nosy: 0, real: 1 },
+            tone: "good",
+            feedback: "좋은 감각입니다. 한국에서 “밥 먹었어?”는 종종 “너 괜찮아?”, “잘 지내?”라는 마음의 표현입니다."
+          },
+          {
+            text: "한국인은 음식에만 관심이 있다는 뜻이다.",
+            scores: { jeong: -1, care: 0, nosy: 0, real: 0 },
+            tone: "risky",
+            feedback: "그렇게만 보면 정서가 잘 보이지 않습니다. 음식은 한국에서 마음을 묻는 가장 익숙한 언어 중 하나입니다."
+          },
+          {
+            text: "내가 밥을 안 먹는다고 의심하는 말이다.",
+            scores: { jeong: 0, care: -1, nosy: 0, real: 0 },
+            tone: "neutral",
+            feedback: "대부분은 의심이 아니라 걱정에 가깝습니다. 반복되는 질문처럼 들려도 안부 인사일 가능성이 큽니다."
+          }
+        ]
+      },
+      {
+        category: "외상",
+        title: "김밥 하나만 내일 줄게",
+        situation: "단골 할머니가 김밥을 외상으로 달라고 합니다.\n당신은 작은 분식집을 운영 중이고, 돈도 넉넉하지 않습니다.",
+        choices: [
+          {
+            text: "규칙대로 무조건 거절한다.",
+            scores: { jeong: -1, care: 0, nosy: 0, real: 2 },
+            tone: "neutral",
+            feedback: "현실적인 선택입니다. 하지만 골목 관계에서는 한 번의 차가운 거절이 오래 남을 수도 있습니다."
+          },
+          {
+            text: "매번 공짜로 드린다.",
+            scores: { jeong: 2, care: 0, nosy: 0, real: -2 },
+            tone: "neutral",
+            feedback: "마음은 따뜻하지만 지속 가능하지 않습니다. 정은 자기희생만을 뜻하지 않습니다."
+          },
+          {
+            text: "오늘은 드리되, 다음엔 작은 일이라도 도와달라고 부탁한다.",
+            scores: { jeong: 2, care: 2, nosy: 0, real: 2 },
+            tone: "good",
+            feedback: "아주 좋은 균형입니다. 공짜가 아니라 서로 돕는 관계로 만들면 상대의 부담도 줄어듭니다."
+          },
+          {
+            text: "왜 돈이 없는지 사람들 앞에서 묻는다.",
+            scores: { jeong: -1, care: -2, nosy: 2, real: 0 },
+            tone: "risky",
+            feedback: "좋은 의도여도 공개적인 질문은 상대의 자존심을 다치게 할 수 있습니다. 정에는 거리감도 필요합니다."
+          }
+        ]
+      },
+      {
+        category: "나눔",
+        title: "문 앞의 김치통",
+        situation: "가게 앞에 누군가 김치통을 두고 갔습니다.\n누가 줬는지 물어봐도 다들 모르는 척합니다.",
+        choices: [
+          {
+            text: "부담스러우니 바로 돌려준다.",
+            scores: { jeong: -1, care: 0, nosy: 0, real: 1 },
+            tone: "neutral",
+            feedback: "부담을 느끼는 건 자연스럽지만, 한국식 나눔에서는 받는 것도 관계를 이어가는 방식일 수 있습니다."
+          },
+          {
+            text: "누가 줬는지 끝까지 추궁한다.",
+            scores: { jeong: 0, care: -1, nosy: 2, real: 0 },
+            tone: "risky",
+            feedback: "정은 가끔 민망함을 피하려고 익명으로 오갑니다. 끝까지 밝히려 하면 준 사람의 배려가 어색해질 수 있습니다."
+          },
+          {
+            text: "고맙게 받고 나중에 음식을 조금 나눈다.",
+            scores: { jeong: 2, care: 2, nosy: 0, real: 1 },
+            tone: "good",
+            feedback: "좋습니다. 마음은 돈으로 바로 계산하기보다, 다른 마음으로 천천히 돌려주는 것이 자연스럽습니다."
+          },
+          {
+            text: "공짜니까 당연하게 먹는다.",
+            scores: { jeong: -1, care: -1, nosy: 0, real: 0 },
+            tone: "risky",
+            feedback: "정은 공짜 물건이 아니라 마음의 왕복입니다. 당연하게 여기면 관계의 온도가 식을 수 있습니다."
+          }
+        ]
+      },
+      {
+        category: "걱정",
+        title: "컵라면만 먹는 학생",
+        situation: "학생이 매일 컵라면만 먹습니다.\n걱정되지만 아직 친한 사이는 아닙니다.",
+        choices: [
+          {
+            text: "“그렇게 먹으면 몸 망가져”라고 바로 말한다.",
+            scores: { jeong: 1, care: -1, nosy: 2, real: 0 },
+            tone: "risky",
+            feedback: "걱정은 느껴지지만 가까운 사이가 아니라면 잔소리나 간섭처럼 들릴 수 있습니다."
+          },
+          {
+            text: "아무 말 없이 따뜻한 국물이나 작은 반찬을 곁들인다.",
+            scores: { jeong: 2, care: 2, nosy: 0, real: 1 },
+            tone: "good",
+            feedback: "좋은 선택입니다. 말보다 조용한 행동이 더 안전한 정이 될 때가 많습니다."
+          },
+          {
+            text: "가족이 왜 밥을 안 해주냐고 묻는다.",
+            scores: { jeong: 0, care: -2, nosy: 3, real: 0 },
+            tone: "risky",
+            feedback: "가족 문제는 매우 사적인 영역입니다. 좋은 의도라도 상대에게 상처가 될 수 있습니다."
+          },
+          {
+            text: "전혀 신경 쓰지 않는다.",
+            scores: { jeong: -2, care: 0, nosy: 0, real: 1 },
+            tone: "neutral",
+            feedback: "선을 지키는 선택일 수 있지만, 정은 가끔 ‘그냥 지나치지 않는 마음’에서 시작됩니다."
+          }
+        ]
+      },
+      {
+        category: "배려",
+        title: "택배기사의 점심",
+        situation: "택배기사님이 바빠서 점심을 못 먹었다고 합니다.\n가게에는 남은 김밥이 하나 있습니다.",
+        choices: [
+          {
+            text: "정가로 판다.",
+            scores: { jeong: 0, care: 0, nosy: 0, real: 2 },
+            tone: "neutral",
+            feedback: "틀린 선택은 아닙니다. 다만 정을 보여주는 순간은 아니었습니다."
+          },
+          {
+            text: "“폐기할 예정이었어요”라고 말하며 건넨다.",
+            scores: { jeong: 2, care: 2, nosy: 0, real: 1 },
+            tone: "good",
+            feedback: "상대가 미안해하지 않게 이유를 만들어주는 배려입니다. 정은 자존심을 지켜주는 방식이기도 합니다."
+          },
+          {
+            text: "“불쌍하시네요”라고 말하며 준다.",
+            scores: { jeong: 1, care: -2, nosy: 1, real: 0 },
+            tone: "risky",
+            feedback: "도움은 되었지만 표현이 상대를 초라하게 만들 수 있습니다. 정은 말의 온도도 중요합니다."
+          },
+          {
+            text: "다음 손님을 위해 아껴둔다.",
+            scores: { jeong: -1, care: 0, nosy: 0, real: 2 },
+            tone: "neutral",
+            feedback: "운영 관점에서는 합리적입니다. 다만 이 상황에서는 관계가 깊어질 기회를 놓쳤습니다."
+          }
+        ]
+      },
+      {
+        category: "잔소리",
+        title: "옷 좀 따뜻하게 입어요",
+        situation: "한국인 친구가 춥다며 옷을 더 입으라고 계속 말합니다.\n당신은 괜찮다고 했는데도 또 말합니다.",
+        choices: [
+          {
+            text: "나를 통제하려는 행동이라고만 생각한다.",
+            scores: { jeong: -1, care: -1, nosy: 0, real: 0 },
+            tone: "neutral",
+            feedback: "그렇게 느낄 수도 있지만, 많은 경우 걱정이 서툴게 표현된 것일 수 있습니다."
+          },
+          {
+            text: "귀찮지만 걱정의 표현일 수 있다고 이해한다.",
+            scores: { jeong: 2, care: 1, nosy: 0, real: 1 },
+            tone: "good",
+            feedback: "좋습니다. 한국식 정은 때때로 잔소리처럼 들릴 수 있습니다. 물론 너무 심하면 선을 말해도 됩니다."
+          },
+          {
+            text: "화를 내며 상관하지 말라고 한다.",
+            scores: { jeong: -2, care: -1, nosy: 0, real: 0 },
+            tone: "risky",
+            feedback: "경계를 표현할 수는 있지만, 방식이 강하면 관계가 멀어질 수 있습니다."
+          },
+          {
+            text: "무조건 친구 말을 따른다.",
+            scores: { jeong: 1, care: 0, nosy: 0, real: -1 },
+            tone: "neutral",
+            feedback: "상대 마음을 받아주는 건 좋지만, 정은 내 의사를 없애는 것이 아닙니다."
+          }
+        ]
+      },
+      {
+        category: "침묵",
+        title: "혼자 있고 싶은 날",
+        situation: "단골 손님이 평소와 달리 말이 없습니다.\n무슨 일이 있어 보이지만 대답하고 싶어 하지 않습니다.",
+        choices: [
+          {
+            text: "계속 무슨 일이냐고 묻는다.",
+            scores: { jeong: 1, care: -2, nosy: 3, real: 0 },
+            tone: "risky",
+            feedback: "걱정은 보이지만 상대가 말하고 싶지 않을 때 계속 묻는 건 부담이 됩니다."
+          },
+          {
+            text: "아무 관심도 보이지 않는다.",
+            scores: { jeong: -1, care: 0, nosy: 0, real: 1 },
+            tone: "neutral",
+            feedback: "간섭하지 않는 선택이지만, 정은 작은 신호를 알아차리는 데서 시작되기도 합니다."
+          },
+          {
+            text: "평소 좋아하던 음식을 조용히 준비해준다.",
+            scores: { jeong: 2, care: 2, nosy: 0, real: 1 },
+            tone: "good",
+            feedback: "좋은 선택입니다. 말하지 않아도 기억해주는 것, 그것이 정을 가장 잘 보여줍니다."
+          },
+          {
+            text: "다른 손님들에게 무슨 일인지 물어본다.",
+            scores: { jeong: 0, care: -2, nosy: 3, real: 0 },
+            tone: "risky",
+            feedback: "걱정이 소문이 되면 상처가 됩니다. 정은 사생활을 지켜주는 마음도 포함합니다."
+          }
+        ]
+      },
+      {
+        category: "선물",
+        title: "명절 과일 상자",
+        situation: "별로 친하지 않은 이웃이 명절이라고 작은 과일 상자를 줍니다.\n당신은 조금 부담스럽습니다.",
+        choices: [
+          {
+            text: "바로 거절한다.",
+            scores: { jeong: -1, care: -1, nosy: 0, real: 1 },
+            tone: "neutral",
+            feedback: "부담을 피할 수는 있지만, 한국 문화에서는 선물을 받는 것도 관계의 시작이 될 수 있습니다."
+          },
+          {
+            text: "받기만 하고 아무 반응도 하지 않는다.",
+            scores: { jeong: -1, care: -1, nosy: 0, real: 0 },
+            tone: "risky",
+            feedback: "받는 것 자체보다 이후의 인사와 마음 표현이 중요합니다."
+          },
+          {
+            text: "고맙게 받고 나중에 작은 간식이나 인사로 마음을 돌려준다.",
+            scores: { jeong: 2, care: 2, nosy: 0, real: 1 },
+            tone: "good",
+            feedback: "좋습니다. 너무 큰 답례보다 작은 마음의 왕복이 더 자연스럽습니다."
+          },
+          {
+            text: "더 비싼 선물을 바로 사서 갚는다.",
+            scores: { jeong: 1, care: 0, nosy: 0, real: -1 },
+            tone: "neutral",
+            feedback: "성의는 있지만 너무 큰 답례는 상대에게 또 다른 부담이 될 수 있습니다."
+          }
+        ]
+      },
+      {
+        category: "반찬",
+        title: "자꾸 반찬을 주는 이웃",
+        situation: "이웃이 반찬을 자꾸 나눠줍니다.\n당신은 매번 받기만 해서 미안합니다.",
+        choices: [
+          {
+            text: "이제 그만 주라고 차갑게 말한다.",
+            scores: { jeong: -2, care: -1, nosy: 0, real: 1 },
+            tone: "risky",
+            feedback: "부담을 말할 수는 있지만 차갑게 끊으면 상대의 마음까지 거절한 것처럼 느껴질 수 있습니다."
+          },
+          {
+            text: "고맙게 받고, 어느 날 내가 잘하는 음식이나 작은 간식으로 답한다.",
+            scores: { jeong: 2, care: 2, nosy: 0, real: 1 },
+            tone: "good",
+            feedback: "좋은 선택입니다. 정은 돈으로 즉시 계산하기보다 마음으로 천천히 돌려주는 경우가 많습니다."
+          },
+          {
+            text: "반찬값을 계산해서 돈을 준다.",
+            scores: { jeong: 0, care: -1, nosy: 0, real: 2 },
+            tone: "neutral",
+            feedback: "합리적이지만, 한국식 나눔에서는 돈으로 바로 계산하면 분위기가 어색해질 수 있습니다."
+          },
+          {
+            text: "부담스러워서 이웃을 피한다.",
+            scores: { jeong: -1, care: 0, nosy: 0, real: 0 },
+            tone: "neutral",
+            feedback: "피하는 것보다 고마움과 부담을 부드럽게 표현하는 편이 관계를 덜 상하게 합니다."
+          }
+        ]
+      },
+      {
+        category: "핵심",
+        title: "진짜 정에 가장 가까운 것",
+        situation: "다음 중 한국인의 ‘정’에 가장 가까운 것은 무엇일까요?",
+        choices: [
+          {
+            text: "항상 친절하게 말하는 것",
+            scores: { jeong: 0, care: 1, nosy: 0, real: 0 },
+            tone: "neutral",
+            feedback: "친절은 정의 일부일 수 있지만, 정은 말투보다 오래 쌓이는 관계에 가깝습니다."
+          },
+          {
+            text: "무조건 남을 도와주는 것",
+            scores: { jeong: 1, care: 0, nosy: 1, real: -1 },
+            tone: "neutral",
+            feedback: "도움은 중요하지만 무조건적인 희생은 정이 아닙니다. 지속 가능성과 거리감도 필요합니다."
+          },
+          {
+            text: "상대를 기억하고, 부담스럽지 않게 챙기며, 시간이 지나도 마음을 이어가는 것",
+            scores: { jeong: 3, care: 3, nosy: 0, real: 2 },
+            tone: "good",
+            feedback: "가장 핵심에 가깝습니다. 정은 친절보다 오래가고, 의무보다 따뜻한 관계의 감각입니다."
+          },
+          {
+            text: "가족이나 친구에게만 잘하는 것",
+            scores: { jeong: -1, care: 0, nosy: 0, real: 0 },
+            tone: "risky",
+            feedback: "정은 가까운 사람에게만 생기는 것이 아닙니다. 단골, 이웃, 동료 사이에도 천천히 쌓일 수 있습니다."
+          }
+        ]
+      }
+    ];
+
+    const labels = {
+      jeong: "정 지수",
+      care: "배려 지수",
+      nosy: "오지랖 지수",
+      real: "현실 감각"
+    };
+
+    let index = 0;
+    let scores = { jeong: 0, care: 0, nosy: 0, real: 0 };
+    let answered = false;
+
+    function startQuiz() {
+      index = 0;
+      scores = { jeong: 0, care: 0, nosy: 0, real: 0 };
+      answered = false;
+      document.getElementById("start").classList.add("hidden");
+      document.getElementById("resultCard").classList.add("hidden");
+      document.getElementById("quizCard").classList.remove("hidden");
+      renderQuestion();
+      renderScores();
+    }
+
+    function restart() {
+      document.getElementById("quizCard").classList.add("hidden");
+      document.getElementById("resultCard").classList.add("hidden");
+      document.getElementById("start").classList.remove("hidden");
+      index = 0;
+      scores = { jeong: 0, care: 0, nosy: 0, real: 0 };
+      answered = false;
+    }
+
+    function renderQuestion() {
+      answered = false;
+      const q = questions[index];
+      document.getElementById("category").textContent = q.category;
+      document.getElementById("title").textContent = q.title;
+      document.getElementById("situation").textContent = q.situation;
+      document.getElementById("count").textContent = `${index + 1} / ${questions.length}`;
+      document.getElementById("progressBar").style.width = `${(index / questions.length) * 100}%`;
+      document.getElementById("feedback").classList.add("hidden");
+      document.getElementById("nextBtn").textContent = index === questions.length - 1 ? "결과 보기" : "다음 상황";
+
+      const choices = document.getElementById("choices");
+      choices.innerHTML = "";
+      q.choices.forEach((choice, i) => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.textContent = `${i + 1}. ${choice.text}`;
+        btn.onclick = () => choose(choice, btn);
+        choices.appendChild(btn);
+      });
+    }
+
+    function choose(choice, btn) {
+      if (answered) return;
+      answered = true;
+
+      Object.keys(choice.scores).forEach(k => {
+        scores[k] += choice.scores[k];
+      });
+
+      document.querySelectorAll(".choice").forEach(el => el.disabled = true);
+      if (choice.tone === "good") btn.classList.add("correctish");
+      if (choice.tone === "risky") btn.classList.add("risky");
+
+      document.getElementById("feedbackTitle").textContent =
+        choice.tone === "good" ? "좋은 감각이에요" :
+        choice.tone === "risky" ? "조금 위험한 선택이에요" :
+        "이 선택도 의미가 있어요";
+
+      document.getElementById("feedbackText").textContent = choice.feedback;
+
+      const delta = document.getElementById("delta");
+      delta.innerHTML = "";
+      Object.entries(choice.scores).forEach(([k, v]) => {
+        if (v !== 0) {
+          const pill = document.createElement("span");
+          pill.className = "pill";
+          pill.textContent = `${labels[k]} ${v > 0 ? "+" : ""}${v}`;
+          delta.appendChild(pill);
+        }
+      });
+
+      document.getElementById("feedback").classList.remove("hidden");
+      renderScores();
+    }
+
+    function nextQuestion() {
+      if (!answered) return;
+      index += 1;
+      if (index >= questions.length) {
+        showResult();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function renderScores() {
+      const max = 22;
+      const scoreList = document.getElementById("scoreList");
+      scoreList.innerHTML = "";
+
+      Object.keys(labels).forEach(k => {
+        const value = scores[k];
+        const percent = Math.max(0, Math.min(100, ((value + 4) / (max + 4)) * 100));
+        const div = document.createElement("div");
+        div.className = "score";
+        div.innerHTML = `
+          <div class="score-head"><span>${labels[k]}</span><span>${value}</span></div>
+          <div class="mini-bar"><div style="width:${percent}%"></div></div>
+        `;
+        scoreList.appendChild(div);
+      });
+    }
+
+    function getResultType() {
+      const { jeong, care, nosy, real } = scores;
+
+      if (jeong >= 15 && care >= 14 && real >= 8 && nosy <= 4) {
+        return {
+          tag: "최고 결과",
+          title: "진짜 한국 골목 적응자",
+          desc: "당신은 정이 무엇인지 꽤 잘 이해했습니다.\n\n정은 무조건 가까이 다가가는 것이 아니라, 상대를 기억하고 부담스럽지 않게 곁에 있는 마음입니다.\n당신은 챙김과 거리감, 마음과 현실 사이의 균형을 잘 잡았습니다."
+        };
+      }
+
+      if (nosy >= 8 && jeong >= 10) {
+        return {
+          tag: "따뜻하지만 주의 필요",
+          title: "마음은 따뜻한데 조금 가까운 사람",
+          desc: "당신은 진심으로 사람을 돕고 싶어합니다.\n\n하지만 좋은 마음이 항상 편하게 받아들여지는 것은 아닙니다.\n정은 상대의 마음속 문 앞에서 기다리는 기술이기도 합니다."
+        };
+      }
+
+      if (jeong >= 13 && care >= 10) {
+        return {
+          tag: "따뜻한 유형",
+          title: "따뜻한 골목 사장님",
+          desc: "당신은 사람을 그냥 지나치지 못하는 타입입니다.\n\n작은 음식, 작은 말, 작은 기억으로 관계를 만드는 감각이 있습니다.\n다만 오래 돕기 위해서는 자기 자신과 현실도 함께 지켜야 합니다."
+        };
+      }
+
+      if (real >= 12 && nosy <= 4) {
+        return {
+          tag: "현실 균형형",
+          title: "무뚝뚝하지만 믿음직한 이웃",
+          desc: "당신은 말보다 행동으로 보여주는 타입입니다.\n\n모든 상황에 감정적으로 반응하지 않고, 필요한 순간에 현실적으로 돕습니다.\n한국의 정은 꼭 다정한 말이 아니라 조용한 행동으로도 전해집니다."
+        };
+      }
+
+      if (real >= 10 && jeong < 9) {
+        return {
+          tag: "원칙형",
+          title: "깔끔한 원칙주의자",
+          desc: "당신은 규칙과 경계를 중요하게 생각합니다.\n\n이 태도도 분명 필요합니다. 다만 한국의 골목 문화에서는 가끔 ‘조금 더 챙겨주는 마음’이 관계를 만듭니다."
+        };
+      }
+
+      return {
+        tag: "성장형",
+        title: "정을 배우는 중인 여행자",
+        desc: "당신은 아직 정과 오지랖 사이의 감각을 배우는 중입니다.\n\n정은 친절보다 오래가고, 사랑보다 일상적이며, 의무보다 따뜻한 관계의 감각입니다.\n핵심은 기억, 챙김, 거리감, 지속성입니다."
+      };
+    }
+
+    function showResult() {
+      document.getElementById("quizCard").classList.add("hidden");
+      const result = getResultType();
+      const resultCard = document.getElementById("resultCard");
+      resultCard.classList.remove("hidden");
+
+      resultCard.innerHTML = `
+        <span class="tag">${result.tag}</span>
+        <h2>${result.title}</h2>
+        <p>${result.desc}</p>
+
+        <div class="result-grid">
+          <div class="result-score"><span>정 지수</span>${scores.jeong}</div>
+          <div class="result-score"><span>배려 지수</span>${scores.care}</div>
+          <div class="result-score"><span>오지랖 지수</span>${scores.nosy}</div>
+          <div class="result-score"><span>현실 감각</span>${scores.real}</div>
+        </div>
+
+        <div class="quote">
+          공유 문구<br>
+          나는 한국인의 정 이해도 테스트에서 “${result.title}”가 나왔어요.
+        </div>
+
+        <div class="actions">
+          <button onclick="startQuiz()">다시 하기</button>
+          <button class="secondary" onclick="copyResult('${result.title}')">결과 문구 복사</button>
+        </div>
+      `;
+
+      document.getElementById("progressBar").style.width = `100%`;
+    }
+
+    function copyResult(title) {
+      const text = `나는 한국인의 정 이해도 테스트에서 “${title}”가 나왔어요.`;
+      navigator.clipboard?.writeText(text).then(() => {
+        alert("결과 문구를 복사했습니다.");
+      }).catch(() => {
+        alert(text);
+      });
+    }
+  </script>
+</body>
+</html>

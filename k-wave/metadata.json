@@ -1,0 +1,6 @@
+{
+  "name": "한류의 뿌리, 풍류",
+  "description": "한류의 깊은 뿌리에 자리한 천 년의 미의식 ‘풍류(風流)’",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
