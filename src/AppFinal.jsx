@@ -375,7 +375,7 @@ export default function AppFinal() {
           </button>
           <iframe
             className="kgame-frame"
-            src="/hanbok/"
+            src="http://localhost:3001"
             title="K-BEAUTY 한복 체험"
           />
         </div>
@@ -452,7 +452,7 @@ export default function AppFinal() {
           </button>
           <iframe
             className="kgame-frame"
-            src="/k-wave/"
+            src="http://localhost:3000"
             title="한류의 뿌리, 풍류"
           />
         </div>
