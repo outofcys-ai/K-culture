@@ -434,14 +434,13 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
   };
 
   // 수학 공식 기반 자동 맞춤:
-  // - 캐릭터 머리 꼭대기: charY + headTopOffset
-  // - 한복 목선 정렬: hanbokY = charY + (140 + 120) - necklineFromTop
-  //   (140 = 한복 컨테이너 반높이, 120 = 캐릭터 컨테이너 반높이 = 턱 위치)
-  // - 갓/족두리 배치: accY = headTopY - hatBrimFromCenter + 5(소폭 겹침)
+  // charY=-70: 캐릭터 얼굴을 캔버스 상단에 배치해 얼굴+한복이 동시에 보이게 함
+  // - 한복 목선: hanbokY = chinY + 140 - necklineFromTop  (턱 위치 기준)
+  // - 갓/족두리: accY = headTopY - brimFromCenter + 5  (머리 꼭대기 기준)
   const applySmartFitting = () => {
     setActivePresetFit('smart');
 
-    const charY = 45;
+    const charY = -70; // 캐릭터를 캔버스 상단으로 올려 얼굴+한복 동시 표시
     setCharacterTransform({ x: 0, y: charY, scale: 1.0, rotation: 0, flipX: false, opacity: 1 });
 
     if (selectedHanbok) {
