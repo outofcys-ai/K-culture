@@ -37,7 +37,7 @@ export const HanbokSelector: React.FC<HanbokSelectorProps> = ({
   dyeColor,
   onChangeDyeColor,
 }) => {
-  const [activeCategory, setActiveCategory] = useState<HanbokType | 'all'>('accessory');
+  const [activeCategory, setActiveCategory] = useState<HanbokType | 'all'>('all');
 
   const categories: { label: string; value: HanbokType | 'all' }[] = [
     { label: '전체 의상', value: 'all' },
