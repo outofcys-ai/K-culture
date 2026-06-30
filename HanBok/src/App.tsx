@@ -310,10 +310,10 @@ export default function App() {
           </section>
 
           {/* RIGHT COLUMN: Garments wardrobe selector list */}
-          <section className={`hidden lg:flex ${showAdjustPanel ? 'lg:col-span-4' : 'lg:col-span-5'} flex-col gap-4 transition-all duration-300`}>
-            
-            <HanjiCardFrame className="h-full">
-              <div className="flex flex-col h-full justify-between gap-4">
+          <section className={`hidden lg:flex ${showAdjustPanel ? 'lg:col-span-4' : 'lg:col-span-5'} flex-col gap-4 transition-all duration-300 min-h-0 max-h-[calc(100vh-160px)]`}>
+
+            <HanjiCardFrame className="h-full overflow-hidden">
+              <div className="flex flex-col h-full justify-between gap-4 min-h-0">
                 
                 {/* Wardrobe Header */}
                 <div className="border-b border-rose-100 pb-3">
