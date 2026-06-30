@@ -59,7 +59,7 @@ export const HanbokSelector: React.FC<HanbokSelectorProps> = ({
   });
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 h-full">
       {/* Dynamic sorted categories tabs */}
       <div className="flex gap-1.5 overflow-x-auto pb-2 scrollbar-none">
         {categories.map((cat) => {
@@ -155,7 +155,7 @@ export const HanbokSelector: React.FC<HanbokSelectorProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-stone-50 border border-stone-200 rounded-2xl p-3 mt-1 shadow-inner"
+          className="mt-auto bg-stone-50 border border-stone-200 rounded-2xl p-3 shadow-inner"
         >
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-semibold text-stone-800 flex items-center gap-1 font-sans">

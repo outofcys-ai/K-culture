@@ -327,7 +327,7 @@ export default function App() {
                 </div>
 
                 {/* Grid Item lists catalog */}
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col min-h-0">
                   <HanbokSelector
                     selectedHanbokId={selectedHanbok ? selectedHanbok.id : null}
                     selectedAccessoryId={selectedAccessory ? selectedAccessory.id : null}
