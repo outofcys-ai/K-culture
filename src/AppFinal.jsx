@@ -240,22 +240,20 @@ export default function AppFinal() {
   const audioRef = useRef(null);
   const [entering, setEntering] = useState(false);
 
-  const stopBgm = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      audioRef.current = null;
-    }
-  };
-
   const handleOpenVillage = () => {
-    stopBgm(); // 이전에 재생 중인 BGM이 있으면 먼저 중지
     setEntering(true);
+    const proceed = () => { setEntering(false); setStage("village"); };
+
+    // 이미 재생 중이면 잠깐 입장 표시 후 그냥 전환 (BGM 유지)
+    if (audioRef.current) {
+      setTimeout(proceed, 1500);
+      return;
+    }
+
+    // 처음 입장 시에만 BGM 시작
     const audio = new Audio("/bgm.mp3");
     audio.loop = true;
     audioRef.current = audio;
-
-    const proceed = () => { setEntering(false); setStage("village"); };
 
     // 재생 성공 → 15초 재생 후 전환 / 재생 실패(파일 없음 등) → 즉시 전환
     audio.play()
