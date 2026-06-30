@@ -94,13 +94,13 @@ export default function App() {
   };
 
   return (
-    <div id="main-frame" className="min-h-screen bg-[#FDFBF7] flex flex-col justify-between selection:bg-rose-100">
+    <div id="main-frame" className="h-screen overflow-hidden bg-[#FDFBF7] flex flex-col selection:bg-rose-100">
       
       {/* 1. Traditional Dancheong top border */}
       <DancheongBorder />
 
       {/* Main Core View Area */}
-      <main className={`flex-1 w-full mx-auto px-4 py-6 md:py-8 flex flex-col gap-6 transition-all duration-300 ${showAdjustPanel ? 'max-w-7xl' : 'max-w-6xl'}`}>
+      <main className={`flex-1 min-h-0 overflow-y-auto w-full mx-auto px-4 py-3 md:py-4 flex flex-col gap-4 transition-all duration-300 ${showAdjustPanel ? 'max-w-7xl' : 'max-w-6xl'}`}>
         
         {/* Navigation & Header */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-200 pb-5">
@@ -359,19 +359,6 @@ export default function App() {
 
       </main>
 
-      {/* Footer copyright info */}
-      <footer className="w-full bg-[#1E293B] text-zinc-400 py-6 text-center text-xs mt-12 border-t-4 border-amber-600 font-sans">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 select-none">
-            <span className="text-lg">🎑</span>
-            <span className="text-zinc-200 font-semibold tracking-wider">꼬마 한복 스튜디오</span>
-            <span className="text-[10px] text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">K-Classic 2026 Edition</span>
-          </div>
-          <p className="text-[11px] text-zinc-500">
-            © 2026 Playful Hanbok Dress Up. Designed with high fidelity Korean vector layers on canvas.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
