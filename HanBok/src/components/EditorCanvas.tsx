@@ -920,7 +920,7 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
-              className="relative w-full aspect-square border border-stone-200 rounded-3xl bg-[#FCF9F2] shadow-md overflow-hidden cursor-move touch-none select-none"
+              className="relative w-full border border-stone-200 rounded-3xl bg-[#FCF9F2] shadow-md overflow-hidden cursor-move touch-none select-none" style={{ aspectRatio: '3/4' }}
             >
               {/* Aesthetic background patterns */}
               <TraditionalGrid />
