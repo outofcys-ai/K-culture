@@ -248,13 +248,10 @@ export default function AppFinal() {
 
     const proceed = () => { setEntering(false); setStage("village"); };
 
-    audio.addEventListener("canplaythrough", () => {
-      audio.play().catch(() => {});
-      setTimeout(proceed, 15000);
-    }, { once: true });
+    // 클릭 직후 바로 play() 호출해야 브라우저 자동재생 정책 통과
+    audio.play().catch(() => {});
+    setTimeout(proceed, 15000);
     audio.addEventListener("error", () => setTimeout(proceed, 500), { once: true });
-    setTimeout(proceed, 20000); // 최대 대기
-    audio.load();
   };
 
   const handleOpenProject = () => {
