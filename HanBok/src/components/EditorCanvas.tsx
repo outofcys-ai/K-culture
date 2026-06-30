@@ -856,11 +856,12 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
                   
                   {/* Layer 1: Base Template */}
                   <div
-                    onPointerDown={() => { setActiveTarget('character'); setShowAdjustPanel(true); }}
+                    onPointerDown={() => { setActiveTarget('character'); setShowAdjustPanel(true); setMobileSubTab('adjust'); }}
                     className="absolute pointer-events-auto cursor-move transition-all duration-75 flex items-center justify-center rounded-full overflow-hidden"
                     style={{
                       width: '240px',
                       height: '240px',
+                      zIndex: 20, // 얼굴 클릭 우선
                       transform: `translate(${characterTransform.x}px, ${characterTransform.y}px) rotate(${characterTransform.rotation}deg) scale(${characterTransform.scale * (characterTransform.flipX ? -1 : 1)}, ${characterTransform.scale})`,
                       opacity: characterTransform.opacity,
                       outline: activeTarget === 'character' ? '2px dashed #10B981' : 'none',
@@ -894,11 +895,12 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
                   {/* Layer 2: Hanbok Active Overlay */}
                   {selectedHanbok && (
                     <div
-                      onPointerDown={() => { setActiveTarget('hanbok'); setShowAdjustPanel(true); }}
+                      onPointerDown={() => { setActiveTarget('hanbok'); setShowAdjustPanel(true); setMobileSubTab('adjust'); }}
                       className="absolute pointer-events-auto cursor-move transition-all duration-75 flex items-center justify-center"
                       style={{
                         width: '320px',
                         height: '280px',
+                        zIndex: 10, // 한복은 배경(클릭 우선순위 낮음)
                         transform: `translate(${hanbokTransform.x}px, ${hanbokTransform.y}px) rotate(${hanbokTransform.rotation}deg) scale(${hanbokTransform.scale * (hanbokTransform.flipX ? -1 : 1)}, ${hanbokTransform.scale})`,
                         opacity: hanbokTransform.opacity,
                         outline: activeTarget === 'hanbok' ? '2px dashed #DC2626' : 'none',
@@ -917,11 +919,12 @@ export const EditorCanvas: React.FC<EditorCanvasProps> = ({
                   {/* Layer 3: Accessory Active Overlay */}
                   {selectedAccessory && (
                     <div
-                      onPointerDown={() => { setActiveTarget('accessory'); setShowAdjustPanel(true); }}
+                      onPointerDown={() => { setActiveTarget('accessory'); setShowAdjustPanel(true); setMobileSubTab('adjust'); }}
                       className="absolute pointer-events-auto cursor-move transition-all duration-75 flex items-center justify-center"
                       style={{
                         width: '200px',
                         height: '120px',
+                        zIndex: 30, // 장신구(모자) 최상위 클릭 우선
                         transform: `translate(${accessoryTransform.x}px, ${accessoryTransform.y}px) rotate(${accessoryTransform.rotation}deg) scale(${accessoryTransform.scale * (accessoryTransform.flipX ? -1 : 1)}, ${accessoryTransform.scale})`,
                         opacity: accessoryTransform.opacity,
                         outline: activeTarget === 'accessory' ? '2px dashed #1D4ED8' : 'none',
