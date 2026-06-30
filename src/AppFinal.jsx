@@ -238,19 +238,19 @@ export default function AppFinal() {
   };
 
   const audioRef = useRef(null);
+  const [entering, setEntering] = useState(false);
 
   const handleOpenVillage = () => {
-    setStage("entering");
+    setEntering(true);
     const audio = new Audio("/bgm.mp3");
     audio.loop = true;
     audioRef.current = audio;
 
-    const proceed = () => setStage("village");
+    const proceed = () => { setEntering(false); setStage("village"); };
 
     audio.addEventListener("canplaythrough", proceed, { once: true });
-    // mp3 없거나 로딩 실패해도 2초 후 진행
     audio.addEventListener("error", () => setTimeout(proceed, 500), { once: true });
-    setTimeout(proceed, 4000); // 최대 4초 대기
+    setTimeout(proceed, 4000);
     audio.load();
   };
 
@@ -269,18 +269,18 @@ export default function AppFinal() {
             onClick={handleOpenVillage}
             aria-label="궁궐로 입장하기"
           />
+          {entering && (
+            <div className="entering-label">
+              입장중입니다
+              <span className="entering-dots">
+                <span>·</span><span>·</span><span>·</span><span>·</span>
+              </span>
+            </div>
+          )}
           <div className="story-caption">
             <p className="story-caption-title">궁궐을 누르면 탐험 사랑방으로 들어갑니다.</p>
           </div>
         </ImageStage>
-      ) : null}
-
-      {stage === "entering" ? (
-        <div className="entering-screen">
-          <p className="entering-text">
-            입장중입니다<span className="entering-dots"><span>.</span><span>.</span><span>.</span></span>
-          </p>
-        </div>
       ) : null}
 
       {stage === "village" ? (
