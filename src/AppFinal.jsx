@@ -242,11 +242,28 @@ export default function AppFinal() {
 
   const handleOpenVillage = () => {
     setEntering(true);
-    const proceed = () => { setEntering(false); setStage("village"); };
+    const fadeOut = (audio) => {
+      const step = audio.volume / 20;
+      const id = setInterval(() => {
+        if (audio.volume <= step) {
+          audio.pause();
+          audioRef.current = null;
+          clearInterval(id);
+        } else {
+          audio.volume = Math.max(0, audio.volume - step);
+        }
+      }, 100); // 2초에 걸쳐 페이드 아웃
+    };
+
+    const proceed = (audio) => {
+      setEntering(false);
+      setStage("village");
+      if (audio) setTimeout(() => fadeOut(audio), 5000);
+    };
 
     // 이미 재생 중이면 잠깐 입장 표시 후 그냥 전환 (BGM 유지)
     if (audioRef.current) {
-      setTimeout(proceed, 1500);
+      setTimeout(() => proceed(audioRef.current), 1500);
       return;
     }
 
@@ -257,8 +274,8 @@ export default function AppFinal() {
 
     // 재생 성공 → 15초 재생 후 전환 / 재생 실패(파일 없음 등) → 즉시 전환
     audio.play()
-      .then(() => { setTimeout(proceed, 15000); })
-      .catch((err) => { console.error("BGM 재생 실패:", err); proceed(); });
+      .then(() => { setTimeout(() => proceed(audio), 15000); })
+      .catch((err) => { console.error("BGM 재생 실패:", err); proceed(null); });
   };
 
   const goToVillage = () => setStage("village");
