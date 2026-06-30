@@ -81,7 +81,7 @@ export const HanbokSelector: React.FC<HanbokSelectorProps> = ({
       </div>
 
       {/* Primary items grid */}
-      <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 max-h-[200px] overflow-y-auto pr-1">
+      <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 flex-1 min-h-0 overflow-y-auto pr-1 content-start">
         {filteredItems.map((item) => {
           const isAccessory = item.type === 'accessory';
           const isSelected = isAccessory
