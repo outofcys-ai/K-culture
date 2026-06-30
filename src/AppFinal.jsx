@@ -248,9 +248,12 @@ export default function AppFinal() {
 
     const proceed = () => { setEntering(false); setStage("village"); };
 
-    audio.addEventListener("canplaythrough", proceed, { once: true });
+    audio.addEventListener("canplaythrough", () => {
+      audio.play().catch(() => {});
+      setTimeout(proceed, 15000);
+    }, { once: true });
     audio.addEventListener("error", () => setTimeout(proceed, 500), { once: true });
-    setTimeout(proceed, 4000);
+    setTimeout(proceed, 20000); // 최대 대기
     audio.load();
   };
 
