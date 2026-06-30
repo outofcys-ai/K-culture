@@ -240,7 +240,16 @@ export default function AppFinal() {
   const audioRef = useRef(null);
   const [entering, setEntering] = useState(false);
 
+  const stopBgm = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+  };
+
   const handleOpenVillage = () => {
+    stopBgm(); // 이전에 재생 중인 BGM이 있으면 먼저 중지
     setEntering(true);
     const audio = new Audio("/bgm.mp3");
     audio.loop = true;
@@ -253,6 +262,8 @@ export default function AppFinal() {
       .then(() => { setTimeout(proceed, 15000); })
       .catch((err) => { console.error("BGM 재생 실패:", err); proceed(); });
   };
+
+  const goToVillage = () => setStage("village");
 
   const handleOpenProject = () => {
     setStage("project");
@@ -333,7 +344,7 @@ export default function AppFinal() {
           <button
             type="button"
             className="story-back-button"
-            onClick={handleOpenVillage}
+            onClick={goToVillage}
           >
             탐험 사랑방으로
           </button>
@@ -369,7 +380,7 @@ export default function AppFinal() {
           <button
             type="button"
             className="story-back-button"
-            onClick={handleOpenVillage}
+            onClick={goToVillage}
           >
             탐험 사랑방으로
           </button>
@@ -390,7 +401,7 @@ export default function AppFinal() {
           <button
             type="button"
             className="story-back-button kgame-back-button"
-            onClick={handleOpenVillage}
+            onClick={goToVillage}
           >
             탐험 사랑방으로
           </button>
@@ -407,7 +418,7 @@ export default function AppFinal() {
           <button
             type="button"
             className="story-back-button kgame-back-button"
-            onClick={handleOpenVillage}
+            onClick={goToVillage}
           >
             탐험 사랑방으로
           </button>
@@ -485,7 +496,7 @@ export default function AppFinal() {
             <button
               type="button"
               className="story-back-button project-back-button"
-              onClick={handleOpenVillage}
+              onClick={goToVillage}
             >
               탐험 사랑방으로
             </button>
