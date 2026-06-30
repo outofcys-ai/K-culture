@@ -248,10 +248,10 @@ export default function AppFinal() {
 
     const proceed = () => { setEntering(false); setStage("village"); };
 
-    // 클릭 직후 바로 play() 호출해야 브라우저 자동재생 정책 통과
-    audio.play().catch(() => {});
-    setTimeout(proceed, 15000);
-    audio.addEventListener("error", () => setTimeout(proceed, 500), { once: true });
+    // 재생 성공 → 15초 재생 후 전환 / 재생 실패(파일 없음 등) → 즉시 전환
+    audio.play()
+      .then(() => { setTimeout(proceed, 15000); })
+      .catch((err) => { console.error("BGM 재생 실패:", err); proceed(); });
   };
 
   const handleOpenProject = () => {
