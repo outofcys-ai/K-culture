@@ -14,7 +14,7 @@ export default function App() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character>(CHARACTERS[0]);
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null);
   const [selectedHanbok, setSelectedHanbok] = useState<HanbokItem | null>(HANBOKS[0]);
-  const [selectedAccessory, setSelectedAccessory] = useState<HanbokItem | null>(ACCESSORIES[1]); // Default Jokduri
+  const [selectedAccessory, setSelectedAccessory] = useState<HanbokItem | null>(ACCESSORIES[0]); // Default 갓
   const [dyeColor, setDyeColor] = useState<string>('#BE123C'); // Default royal crimson
   const [showPhotoUtility, setShowPhotoUtility] = useState<boolean>(false);
   const [showAdjustPanel, setShowAdjustPanel] = useState<boolean>(false);
